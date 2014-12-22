@@ -1,0 +1,20 @@
+{
+    "name": "maud",
+    "version": "0.0.0",
+    "dependencies": {
+    },
+    "devDependencies": {
+        "coffee-script": "*",
+        "grunt": "*",
+        "grunt-contrib-watch": "*",
+        "grunt-contrib-coffee": "*",
+        "grunt-concurrent": "*",
+        "grunt-contrib-connect": "*",
+        "load-grunt-tasks": "*",
+        "connect-livereload": "*",
+        "time-grunt": "*"
+    },
+    "engines": {
+        "node": ">=0.8.0"
+    }
+}

@@ -1,0 +1,10 @@
+body { font-family: "Segoe UI", sans-serif; }
+h1 { padding: 0; margin: 0; margin-bottom: 0.3em;}
+h4 { font-weight: normal; font-size: 0.7em; }
+h2,h3,h4 { margin: 0; padding: 0; }
+h2 { font-size: 0.9em; border: 1px solid #444; display: inline-block; padding: 2px 5px; margin-bottom: 0.2em;}
+canvas { border: 1px solid #aaa; margin: 2px; background-color: #333; }
+#canvas { z-index: 10; }
+#options { margin: 5px;}
+a,a:visited { color: #04a; }
+td { width: 250px; }
