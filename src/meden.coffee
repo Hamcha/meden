@@ -21,20 +21,20 @@ deg2rad = (angle) -> (angle / 180) * Math.PI
 ## Matrix functions ##
 
 # Rotation matricies (X,Y,Z)
-rotX = (a) -> [[1,   0   ,  0   ,0],
-               [0, cos(a),sin(a),0],
-               [0,-sin(a),cos(a),0],
-               [0,   0   ,  0   ,1]]
+rotX = (a) -> [[   1   ,   0   ,   0   ,0],
+               [   0   , cos(a), sin(a),0],
+               [   0   ,-sin(a), cos(a),0],
+               [   0   ,   0   ,   0   ,1]]
 
-rotY = (a) -> [[cos(a),0,-sin(a),0],
-               [  0   ,1,  0    ,0],
-               [sin(a),0, cos(a),0],
-               [0,   0   ,  0   ,1]]
+rotY = (a) -> [[ cos(a),   0   ,-sin(a),0],
+               [   0   ,   1   ,   0   ,0],
+               [ sin(a),   0   , cos(a),0],
+               [   0   ,   0   ,   0   ,1]]
 
-rotZ = (a) -> [[ cos(a),sin(a),0,0],
-               [-sin(a),cos(a),0,0],
-               [   0   ,  0   ,1,0],
-               [0,   0   ,  0   ,1]]
+rotZ = (a) -> [[ cos(a), sin(a),   0   ,0],
+               [-sin(a), cos(a),   0   ,0],
+               [   0   ,   0   ,   1   ,0],
+               [   0   ,   0   ,   0   ,1]]
 
 applyRot = (vertex, rotation) ->
 	vertex = mat4mul vertex, rotX rotation[0]
@@ -44,10 +44,10 @@ applyRot = (vertex, rotation) ->
 
 # Multiply mat4x4 * vec4
 mat4mul = (c,m) ->
-	[c[0]*m[0][0]+c[1]*m[0][1]+c[2]*m[0][2]+c[3]*m[0][3],
-	 c[0]*m[1][0]+c[1]*m[1][1]+c[2]*m[1][2]+c[3]*m[1][3],
-	 c[0]*m[2][0]+c[1]*m[2][1]+c[2]*m[2][2]+c[3]*m[2][3],
-	 c[0]*m[3][0]+c[1]*m[3][1]+c[2]*m[3][2]+c[3]*m[3][3]]
+	[c[0]*m[0][0] + c[1]*m[0][1] + c[2]*m[0][2] + c[3]*m[0][3],
+	 c[0]*m[1][0] + c[1]*m[1][1] + c[2]*m[1][2] + c[3]*m[1][3],
+	 c[0]*m[2][0] + c[1]*m[2][1] + c[2]*m[2][2] + c[3]*m[2][3],
+	 c[0]*m[3][0] + c[1]*m[3][1] + c[2]*m[3][2] + c[3]*m[3][3]]
 
 # Project to Camera
 project = (coord) ->
@@ -57,8 +57,8 @@ project = (coord) ->
 	cpos = [0,0,0]
 	# Put into Perspective
 	pcoord = mat4mul coord, perspmat near, far, fov
-	pcoord = [(pcoord[0] * w / pcoord[2])+w/2,
-	          (pcoord[1] * h / pcoord[2])+h/2]
+	pcoord = [(pcoord[0] * w / pcoord[2]) + w/2,
+	          (pcoord[1] * h / pcoord[2]) + h/2]
 	return pcoord
 
 # Make Transformation matrix from Position, Scale
@@ -81,8 +81,10 @@ perspmat = (near, far, fov) ->
 ## Pixel blitting functions ##
 setp = (b,x,y,c) ->
 	return if x < 0 or x >= w or y < 0 or y >= h
-	b[y*w+x] = (255 << 24) |
-	           (c[2] << 16) | (c[1] << 8) | c[0]
+	b[y*w+x] = (255  << 24) |
+	           (c[2] << 16) |
+	           (c[1] << 8)  |
+	            c[0]
 
 getp = (b,x,y)   -> [b[y*w+x], b[y*w+x+1], b[y*w+x+2]]
 
@@ -113,18 +115,16 @@ draw = (mesh) ->
 medenInit = (ctx) ->
 	# Create global object meden
 	window.meden = {}
-
 	# Depth buffer
-	meden.depth = ctx.createImageData w,h
-	meden.dbuf = new ArrayBuffer meden.depth.data.length
-	meden.db8 = new Uint8ClampedArray meden.dbuf
-	meden.d32 = new Uint32Array meden.dbuf
-
+	meden.depth  = ctx.createImageData w,h
+	meden.dbuf   = new ArrayBuffer meden.depth.data.length
+	meden.db8    = new Uint8ClampedArray meden.dbuf
+	meden.d32    = new Uint32Array meden.dbuf
 	# Final rendering surface
-	meden.img = ctx.createImageData w,h
-	meden.buf = new ArrayBuffer meden.img.data.length
-	meden.bu8 = new Uint8ClampedArray meden.buf
-	meden.b32 = new Uint32Array meden.buf
+	meden.img    = ctx.createImageData w,h
+	meden.buf    = new ArrayBuffer meden.img.data.length
+	meden.bu8    = new Uint8ClampedArray meden.buf
+	meden.b32    = new Uint32Array meden.buf
 
 ## 3d Utils functions ##
 
