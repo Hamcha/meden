@@ -1,5 +1,5 @@
 {
-    "name": "maud",
+    "name": "meden",
     "version": "0.0.0",
     "dependencies": {
     },
@@ -10,6 +10,8 @@
         "grunt-contrib-coffee": "*",
         "grunt-concurrent": "*",
         "grunt-contrib-connect": "*",
+        "grunt-contrib-concat": "*",
+        "grunt-contrib-uglify" : "*",
         "load-grunt-tasks": "*",
         "connect-livereload": "*",
         "time-grunt": "*"
