@@ -5,7 +5,7 @@ module.exports = function (grunt) {
 	require('load-grunt-tasks')(grunt);
 
 	grunt.initConfig({
-		yeoman: {
+	    yeoman: {
             coffee: 'src',
             js: 'build',
         },
@@ -60,5 +60,5 @@ module.exports = function (grunt) {
         }
 	});
     grunt.registerTask('server', ['concurrent:server', 'connect:livereload', 'watch']);
-    grunt.registerTask('build', ['coffee:web', 'compass:dist']);
+    grunt.registerTask('build', ['coffee:web']);
 }
