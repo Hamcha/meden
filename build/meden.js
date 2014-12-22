@@ -177,7 +177,6 @@
     }
     line(320, 0, 320, 480, [255, 0, 0]);
     line(0, 240, 640, 240, [0, 255, 0]);
-    draw(cube([0, 0, 20], [t / 3, t / 10, t / 5], [10, 10, 10]));
     draw(cube([0, 0, 20], [t * 2, t, t / 2], [3, 3, 3]));
     meden.img.data.set(meden.bu8);
     return ctx.putImageData(meden.img, 0, 0);

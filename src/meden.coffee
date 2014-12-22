@@ -43,21 +43,21 @@ applyRot = (vertex, rotation) ->
 	return vertex
 
 # Multiply mat4x4 * vec4
-mat4mul = (c,m) -> 
+mat4mul = (c,m) ->
 	[c[0]*m[0][0]+c[1]*m[0][1]+c[2]*m[0][2]+c[3]*m[0][3],
 	 c[0]*m[1][0]+c[1]*m[1][1]+c[2]*m[1][2]+c[3]*m[1][3],
 	 c[0]*m[2][0]+c[1]*m[2][1]+c[2]*m[2][2]+c[3]*m[2][3],
 	 c[0]*m[3][0]+c[1]*m[3][1]+c[2]*m[3][2]+c[3]*m[3][3]]
 
 # Project to Camera
-project = (coord) -> 
+project = (coord) ->
 	near = 0.1
 	far  = 1000
 	fov  = 70
 	cpos = [0,0,0]
 	# Put into Perspective
 	pcoord = mat4mul coord, perspmat near, far, fov
-	pcoord = [(pcoord[0] * w / pcoord[2])+w/2, 
+	pcoord = [(pcoord[0] * w / pcoord[2])+w/2,
 	          (pcoord[1] * h / pcoord[2])+h/2]
 	return pcoord
 
@@ -79,11 +79,11 @@ perspmat = (near, far, fov) ->
 	        [ 0, 0, 1, 0 ]]
 
 ## Pixel blitting functions ##
-setp = (b,x,y,c) -> 
+setp = (b,x,y,c) ->
 	return if x < 0 or x >= w or y < 0 or y >= h
-	b[y*w+x] = (255 << 24) | 
+	b[y*w+x] = (255 << 24) |
 	           (c[2] << 16) | (c[1] << 8) | c[0]
-	
+
 getp = (b,x,y)   -> [b[y*w+x], b[y*w+x+1], b[y*w+x+2]]
 
 ## 3D Rendering functions ##
@@ -113,7 +113,7 @@ draw = (mesh) ->
 medenInit = (ctx) ->
 	# Create global object meden
 	window.meden = {}
-	
+
 	# Depth buffer
 	meden.depth = ctx.createImageData w,h
 	meden.dbuf = new ArrayBuffer meden.depth.data.length
@@ -125,7 +125,7 @@ medenInit = (ctx) ->
 	meden.buf = new ArrayBuffer meden.img.data.length
 	meden.bu8 = new Uint8ClampedArray meden.buf
 	meden.b32 = new Uint32Array meden.buf
-		
+
 ## 3d Utils functions ##
 
 # Absolute pixel
@@ -171,11 +171,11 @@ renderLoop = () ->
 	meden.b32[i] = -16777216 for i in [0...meden.b32.length] # Clear
 	line 320,0,320,480,[255,0,0]
 	line 0,240,640,240,[0,255,0]
-	draw cube [0,0,20], [t/3,t/10,t/5], [10,10,10]
+	#draw cube [0,0,20], [t/3,t/10,t/5], [10,10,10]
 	draw cube [0,0,20], [t*2,t,t/2], [3,3,3]
 	meden.img.data.set meden.bu8
 	ctx.putImageData meden.img,0,0
-	
+
 # Time variable
 t = Date.now()
 
