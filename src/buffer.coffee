@@ -17,7 +17,14 @@ class Buffer
 		                c[0]
 		return
 
-	getPixel: (x,y) -> [@b8[y*@w+x], @b8[y*@w+x+1], @b8[y*@w+x+2]]
+	getPixel: (x,y) -> 
+		[@b8[y*@w+x], @b8[y*@w+x+1], @b8[y*@w+x+2]]
+
+	_horline: (x1, x2, y, c) ->
+		@setPixel i,y,c for i in [x1..x2]
+		return
+	
+	# Brasenham algorithm
 	line: (x1, y1, x2, y2, c) ->
 		[x1, y1, x2, y2] = [px(x1), px(y1), px(x2), px(y2)]
 		[dx, dy] = [Math.abs(x2 - x1), Math.abs(y2 - y1)]
@@ -35,6 +42,45 @@ class Buffer
 				err += dx
 				y1 += sy
 		return
+
+	# Scanline triangle fill algorithm 
+	# http://www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
+	triangle: (v1, v2, v3, c) ->
+		[A, B, C] = [v1, v2, v3].sort (a, b) -> a[1]-b[1]
+		dx1 = if B[1]-A[1] > 0 then (B[0]-A[0])/(B[1]-A[1]) else 0
+		dx2 = if C[1]-A[1] > 0 then (C[0]-A[0])/(C[1]-A[1]) else 0
+		dx3 = if C[1]-B[1] > 0 then (C[0]-B[0])/(C[1]-B[1]) else 0
+		E = [A[0], A[1]]
+		S = [E[0], E[1]]
+		if dx1 > dx2
+			while S[1] <= B[1]
+				@_horline px(S[0]), px(E[0]), px(S[1]),c 
+				S[1]++
+				E[1]++
+				S[0] += dx2
+				E[0] += dx1
+			E = B
+			while S[1] <= C[1]
+				@_horline px(S[0]), px(E[0]), px(S[1]),c 
+				S[1]++
+				E[1]++
+				S[0] += dx2
+				E[0] += dx3
+		else
+			while S[1] <= B[1]
+				@_horline px(S[0]), px(E[0]), px(S[1]),c 
+				S[1]++
+				E[1]++
+				S[0] += dx1
+				E[0] += dx2
+			S = B
+			while S[1] <= C[1]
+				@_horline px(S[0]), px(E[0]), px(S[1]),c 
+				S[1]++
+				E[1]++
+				S[0] += dx3
+				E[0] += dx2
+
 
 	clear: () ->
 		@b32[i] = -16777216 for i in [0...@b32.length]

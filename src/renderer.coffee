@@ -42,20 +42,28 @@ class Renderer
 		@img   = new Buffer ctx, width, height
 		@options =
 			wireframe : false
+			fill: true
 			culling: true
 		@camera = new Camera width, height, 70, 0.1, 1000
 		return
 
 	draw: (mesh) ->
+		color = [255,255,255]
 		for face in mesh.faces
 			continue if @options.culling and not winding @camera, face, mesh
-			point = Matrix.multiply mesh.verts[face[0]],mesh.matrix
-			for i in [1...face.length]
-				dp1 = @camera.project Matrix.multiply mesh.verts[face[i-1]], mesh.matrix
-				dp2 = @camera.project Matrix.multiply mesh.verts[face[i]],   mesh.matrix
-				@img.line dp1[0],dp1[1],dp2[0],dp2[1],[255,255,255] if @options.wireframe
-			dpa = @camera.project Matrix.multiply mesh.verts[face[0]],mesh.matrix
-			@img.line dpa[0],dpa[1],dp2[0],dp2[1],[255,255,255] if @options.wireframe
+			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]],mesh.matrix
+			dp1 = @camera.project Matrix.multiply mesh.verts[face[1]], mesh.matrix
+			dp2 = @camera.project Matrix.multiply mesh.verts[face[2]],   mesh.matrix
+			if @options.fill
+				@img.triangle dp0[..], dp1[..], dp2[..], color
+			if @options.wireframe
+				if @options.fill
+					wirecolor = [255 - color[0], 255 - color[1], 255 - color[2]]
+				else
+					wirecolor = color
+				@img.line dp0[0],dp0[1],dp1[0],dp1[1], wirecolor
+				@img.line dp1[0],dp1[1],dp2[0],dp2[1],wirecolor
+				@img.line dp2[0],dp2[1],dp0[0],dp0[1],wirecolor
 		return
 
 	clear: ->
@@ -77,7 +85,7 @@ class Meshes
 		faces = [[0,1,3,2],[1,5,7,3],[2,3,7,6],
 		         [4,6,7,5],[0,2,6,4],[0,4,5,1]]
 		verts = verts.map (v) -> applyRot v, rotation
-		faces = triangulateQuads faces if window.triangulate
+		faces = triangulateQuads faces
 		matrix = Matrix.fromTransform position, scale
 		return {matrix, verts, faces}
 

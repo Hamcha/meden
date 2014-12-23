@@ -62,6 +62,7 @@
       this.img = new Buffer(ctx, width, height);
       this.options = {
         wireframe: false,
+        fill: true,
         culling: true
       };
       this.camera = new Camera(width, height, 70, 0.1, 1000);
@@ -69,24 +70,29 @@
     }
 
     Renderer.prototype.draw = function(mesh) {
-      var dp1, dp2, dpa, face, i, point, _i, _j, _len, _ref, _ref1;
+      var color, dp0, dp1, dp2, face, wirecolor, _i, _len, _ref;
+      color = [255, 255, 255];
       _ref = mesh.faces;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         face = _ref[_i];
         if (this.options.culling && !winding(this.camera, face, mesh)) {
           continue;
         }
-        point = Matrix.multiply(mesh.verts[face[0]], mesh.matrix);
-        for (i = _j = 1, _ref1 = face.length; 1 <= _ref1 ? _j < _ref1 : _j > _ref1; i = 1 <= _ref1 ? ++_j : --_j) {
-          dp1 = this.camera.project(Matrix.multiply(mesh.verts[face[i - 1]], mesh.matrix));
-          dp2 = this.camera.project(Matrix.multiply(mesh.verts[face[i]], mesh.matrix));
-          if (this.options.wireframe) {
-            this.img.line(dp1[0], dp1[1], dp2[0], dp2[1], [255, 255, 255]);
-          }
+        dp0 = this.camera.project(Matrix.multiply(mesh.verts[face[0]], mesh.matrix));
+        dp1 = this.camera.project(Matrix.multiply(mesh.verts[face[1]], mesh.matrix));
+        dp2 = this.camera.project(Matrix.multiply(mesh.verts[face[2]], mesh.matrix));
+        if (this.options.fill) {
+          this.img.triangle(dp0.slice(0), dp1.slice(0), dp2.slice(0), color);
         }
-        dpa = this.camera.project(Matrix.multiply(mesh.verts[face[0]], mesh.matrix));
         if (this.options.wireframe) {
-          this.img.line(dpa[0], dpa[1], dp2[0], dp2[1], [255, 255, 255]);
+          if (this.options.fill) {
+            wirecolor = [255 - color[0], 255 - color[1], 255 - color[2]];
+          } else {
+            wirecolor = color;
+          }
+          this.img.line(dp0[0], dp0[1], dp1[0], dp1[1], wirecolor);
+          this.img.line(dp1[0], dp1[1], dp2[0], dp2[1], wirecolor);
+          this.img.line(dp2[0], dp2[1], dp0[0], dp0[1], wirecolor);
         }
       }
     };
@@ -114,9 +120,7 @@
       verts = verts.map(function(v) {
         return applyRot(v, rotation);
       });
-      if (window.triangulate) {
-        faces = triangulateQuads(faces);
-      }
+      faces = triangulateQuads(faces);
       matrix = Matrix.fromTransform(position, scale);
       return {
         matrix: matrix,
