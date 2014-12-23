@@ -6,8 +6,6 @@ renderLoop = () ->
 	t = Date.now()/1000
 	requestAnimationFrame renderLoop
 	meden.clear()
-	meden.img.line 320,0,320,480,[255,0,0]
-	meden.img.line 0,240,640,240,[0,255,0]
 	meden.draw Meshes.cube [0,0,20], [t*2,t,t/2], [3,3,3]
 	meden.show()
 
