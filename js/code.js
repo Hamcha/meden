@@ -7,7 +7,7 @@
 
   frameCount = 0;
 
-  captureInterval = 2000;
+  captureInterval = 1000;
 
   fpscont = document.getElementById("fps");
 
