@@ -23,7 +23,7 @@ winding = (camera,face,mesh) ->
 		dep = camera.project Matrix.multiply mesh.verts[face[i]],mesh.matrix
 		des = camera.project Matrix.multiply mesh.verts[face[i+1]],mesh.matrix
 		area += ((dep[0]-prev[0]) * (prev[1]-des[1])) - ((des[0]-prev[0]) * (prev[1]-dep[1]))
-	return area >= 0
+	return area > 0
 
 class Camera
 	constructor: (@width, @height, @fov, @near, @far) ->
