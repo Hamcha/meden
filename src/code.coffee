@@ -17,6 +17,7 @@ t = Date.now()
 window.switchVar = (varname, value) ->
 	switch varname
 		when 'wireframe' then meden.options.wireframe = value
+		when 'culling' then meden.options.culling = value
 		else console.warn "Unknown option: " + varname
 
 # Init render canvas

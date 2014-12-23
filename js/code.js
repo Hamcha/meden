@@ -20,6 +20,8 @@
     switch (varname) {
       case 'wireframe':
         return meden.options.wireframe = value;
+      case 'culling':
+        return meden.options.culling = value;
       default:
         return console.warn("Unknown option: " + varname);
     }

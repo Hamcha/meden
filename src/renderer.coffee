@@ -6,25 +6,24 @@ applyRot = (vertex, rotation) ->
 	vertex = Matrix.multiply vertex, Matrix.rotateZ rotation[2]
 	return vertex
 
-# Project to Camera
-project = (camera, coord) ->
-	# Put into Perspective
-	pcoord = Matrix.multiply coord, Matrix.perspective ratio, near, far, fov
-	pcoord = [(pcoord[0] * w / pcoord[2]) + w/2,
-	          (pcoord[1] * h / pcoord[2]) + h/2]
-	return pcoord
+triangulateQuads = (faces) ->
+	trifaces = []
+	for face in faces
+		trifaces.push [face[0], face[1], face[2]]
+		trifaces.push [face[2], face[3], face[0]]
+	return trifaces
 
 ## 3D Rendering functions ##
 
 # Backface Culling
-winding = (face,mesh) ->
+winding = (camera,face,mesh) ->
 	area = 0
-	prev = project Matrix.multiply mesh.verts[face[0]],mesh.matrix
+	prev = camera.project Matrix.multiply mesh.verts[face[0]],mesh.matrix
 	for i in [0...face.length-1]
-		dep = project Matrix.multiply mesh.verts[face[i]],mesh.matrix
-		des = project Matrix.multiply mesh.verts[face[i+1]],mesh.matrix
+		dep = camera.project Matrix.multiply mesh.verts[face[i]],mesh.matrix
+		des = camera.project Matrix.multiply mesh.verts[face[i+1]],mesh.matrix
 		area += ((dep[0]-prev[0]) * (prev[1]-des[1])) - ((des[0]-prev[0]) * (prev[1]-dep[1]))
-	return area < 0
+	return area >= 0
 
 class Camera
 	constructor: (@width, @height, @fov, @near, @far) ->
@@ -43,17 +42,19 @@ class Renderer
 		@img   = new Buffer ctx, width, height
 		@options =
 			wireframe : false
+			culling: true
 		@camera = new Camera width, height, 70, 0.1, 1000
 		return
 
 	draw: (mesh) ->
-		for p,i in mesh.faces
-			point = Matrix.multiply mesh.verts[p[0]],mesh.matrix
-			dpa = @camera.project Matrix.multiply mesh.verts[p[0]],mesh.matrix
-			for i in [1...p.length] by 2
-				dp1 = @camera.project Matrix.multiply mesh.verts[p[i-1]], mesh.matrix
-				dp2 = @camera.project Matrix.multiply mesh.verts[p[i]],   mesh.matrix
+		for face in mesh.faces
+			continue if @options.culling and not winding @camera, face, mesh
+			point = Matrix.multiply mesh.verts[face[0]],mesh.matrix
+			for i in [1...face.length]
+				dp1 = @camera.project Matrix.multiply mesh.verts[face[i-1]], mesh.matrix
+				dp2 = @camera.project Matrix.multiply mesh.verts[face[i]],   mesh.matrix
 				@img.line dp1[0],dp1[1],dp2[0],dp2[1],[255,255,255] if @options.wireframe
+			dpa = @camera.project Matrix.multiply mesh.verts[face[0]],mesh.matrix
 			@img.line dpa[0],dpa[1],dp2[0],dp2[1],[255,255,255] if @options.wireframe
 		return
 
@@ -78,6 +79,7 @@ class Meshes
 		faces = [[0,1,3,2],[1,5,7,3],[2,3,7,6],
 		         [4,6,7,5],[0,2,6,4],[0,4,5,1]]
 		verts = verts.map (v) -> applyRot v, rotation
+		faces = triangulateQuads faces
 		matrix = Matrix.fromTransform position, scale
 		return {matrix, verts, faces}
 
