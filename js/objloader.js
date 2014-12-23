@@ -13,9 +13,7 @@
         type = params.splice(0, 1);
         switch (type[0]) {
           case "v":
-            this.verts.push((params.slice(0, 3)).map(function(i) {
-              return parseFloat(i);
-            }));
+            this.verts.push([parseFloat(params[0]), parseFloat(params[1]), parseFloat(params[2]), 1]);
             break;
           case "f":
             this.faces.push((params.slice(0, 3)).map(function(i) {

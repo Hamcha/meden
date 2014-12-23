@@ -14,8 +14,8 @@ renderLoop = () ->
 	requestAnimationFrame renderLoop
 
 	meden.clear()
-	meden.draw Meshes.cube [0,0,20], [t*2,t,t/2], [3,3,3]
-	meden.draw window.model.make [0,0,100], [0,0,0], [1,1,1] 
+	#meden.draw Meshes.cube [0,0,20], [t*2,t,t/2], [3,3,3]
+	meden.draw window.model.make [0,1,10], [Math.PI-0.5,t,0], [2,2,2]
 	meden.show()
 
 	frameCount++
@@ -49,6 +49,7 @@ meden.options.wireframe = true
 xhr "model/hovercraft.obj", {}, (data) ->
 	window.model = new OBJLoader data
 
+	console.log window.model.make [0,0,100], [0,0,0], [1,1,1]
 	# Start rendering
 	canvasdiv = document.getElementById "canvas"
 	canvasdiv.removeChild document.getElementById "loading"

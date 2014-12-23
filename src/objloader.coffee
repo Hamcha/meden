@@ -7,7 +7,7 @@ class OBJLoader
 			type = params.splice 0,1
 			switch type[0]
 				when "v" # Vertex
-					@verts.push (params.slice 0,3).map (i) -> parseFloat i
+					@verts.push [parseFloat(params[0]), parseFloat(params[1]), parseFloat(params[2]), 1]
 				when "f" # Face (MUST BE PRE-TRIANGULATED)
 					@faces.push (params.slice 0,3).map (i) -> (parseInt (i.split "/")[0]) - 1
 		return
