@@ -1,12 +1,5 @@
 (function() {
-  var Camera, Meshes, Renderer, applyRot, triangulateQuads, winding;
-
-  applyRot = function(vertex, rotation) {
-    vertex = Matrix.multiply(vertex, Matrix.rotateX(rotation[0]));
-    vertex = Matrix.multiply(vertex, Matrix.rotateY(rotation[1]));
-    vertex = Matrix.multiply(vertex, Matrix.rotateZ(rotation[2]));
-    return vertex;
-  };
+  var Camera, Meshes, Renderer, triangulateQuads, winding;
 
   triangulateQuads = function(faces) {
     var face, trifaces, _i, _len;
@@ -20,14 +13,11 @@
   };
 
   winding = function(camera, face, mesh) {
-    var area, dep, des, i, prev, _i, _ref;
-    area = 0;
+    var area, dep, des, prev;
     prev = camera.project(Matrix.multiply(mesh.verts[face[0]], mesh.matrix));
-    for (i = _i = 0, _ref = face.length - 1; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-      dep = camera.project(Matrix.multiply(mesh.verts[face[i]], mesh.matrix));
-      des = camera.project(Matrix.multiply(mesh.verts[face[i + 1]], mesh.matrix));
-      area += ((dep[0] - prev[0]) * (prev[1] - des[1])) - ((des[0] - prev[0]) * (prev[1] - dep[1]));
-    }
+    dep = camera.project(Matrix.multiply(mesh.verts[face[1]], mesh.matrix));
+    des = camera.project(Matrix.multiply(mesh.verts[face[2]], mesh.matrix));
+    area = ((dep[0] - prev[0]) * (prev[1] - des[1])) - ((des[0] - prev[0]) * (prev[1] - dep[1]));
     return area > 0;
   };
 
@@ -118,7 +108,7 @@
       verts = [[-0.5, -0.5, -0.5, 1], [-0.5, -0.5, 0.5, 1], [-0.5, 0.5, -0.5, 1], [-0.5, 0.5, 0.5, 1], [0.5, -0.5, -0.5, 1], [0.5, -0.5, 0.5, 1], [0.5, 0.5, -0.5, 1], [0.5, 0.5, 0.5, 1]];
       faces = [[0, 1, 3, 2], [1, 5, 7, 3], [2, 3, 7, 6], [4, 6, 7, 5], [0, 2, 6, 4], [0, 4, 5, 1]];
       verts = verts.map(function(v) {
-        return applyRot(v, rotation);
+        return MathUtil.applyRot(v, rotation);
       });
       faces = triangulateQuads(faces);
       matrix = Matrix.fromTransform(position, scale);

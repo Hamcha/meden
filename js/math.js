@@ -12,6 +12,13 @@
       return (angle / 180) * Math.PI;
     };
 
+    MathUtil.applyRot = function(vertex, rotation) {
+      vertex = Matrix.multiply(vertex, Matrix.rotateX(rotation[0]));
+      vertex = Matrix.multiply(vertex, Matrix.rotateY(rotation[1]));
+      vertex = Matrix.multiply(vertex, Matrix.rotateZ(rotation[2]));
+      return vertex;
+    };
+
     return MathUtil;
 
   })();

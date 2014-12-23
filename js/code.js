@@ -19,6 +19,7 @@
     requestAnimationFrame(renderLoop);
     meden.clear();
     meden.draw(Meshes.cube([0, 0, 20], [t * 2, t, t / 2], [3, 3, 3]));
+    meden.draw(window.model.make([0, 0, 100], [0, 0, 0], [1, 1, 1]));
     meden.show();
     frameCount++;
     if (elapsed > captureInterval) {
@@ -56,9 +57,14 @@
 
   meden.options.wireframe = true;
 
-  document.getElementById("canvas").appendChild(c);
-
-  renderLoop();
+  xhr("model/hovercraft.obj", {}, function(data) {
+    var canvasdiv;
+    window.model = new OBJLoader(data);
+    canvasdiv = document.getElementById("canvas");
+    canvasdiv.removeChild(document.getElementById("loading"));
+    canvasdiv.appendChild(c);
+    return renderLoop();
+  });
 
 }).call(this);
 

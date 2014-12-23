@@ -2,6 +2,7 @@
 
 [w,h] = [640,480] # Resolution
 
+# FPS counter and render loop
 start = Date.now()
 frameCount = 0
 captureInterval = 1000
@@ -14,6 +15,7 @@ renderLoop = () ->
 
 	meden.clear()
 	meden.draw Meshes.cube [0,0,20], [t*2,t,t/2], [3,3,3]
+	meden.draw window.model.make [0,0,100], [0,0,0], [1,1,1] 
 	meden.show()
 
 	frameCount++
@@ -26,6 +28,7 @@ renderLoop = () ->
 # Time variable
 t = Date.now()
 
+# Checkbox callback
 window.switchVar = (varname, value) ->
 	switch varname
 		when 'wireframe' then meden.options.wireframe = value
@@ -42,5 +45,12 @@ ctx = c.getContext "2d"
 window.meden = new Renderer ctx, w, h
 meden.options.wireframe = true
 
-document.getElementById("canvas").appendChild c
-renderLoop()
+# Load OBJ model
+xhr "model/hovercraft.obj", {}, (data) ->
+	window.model = new OBJLoader data
+
+	# Start rendering
+	canvasdiv = document.getElementById "canvas"
+	canvasdiv.removeChild document.getElementById "loading"
+	canvasdiv.appendChild c
+	renderLoop()

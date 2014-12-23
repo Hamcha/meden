@@ -1,11 +1,5 @@
 ## General Utils ##
 
-applyRot = (vertex, rotation) ->
-	vertex = Matrix.multiply vertex, Matrix.rotateX rotation[0]
-	vertex = Matrix.multiply vertex, Matrix.rotateY rotation[1]
-	vertex = Matrix.multiply vertex, Matrix.rotateZ rotation[2]
-	return vertex
-
 triangulateQuads = (faces) ->
 	trifaces = []
 	for face in faces
@@ -16,13 +10,11 @@ triangulateQuads = (faces) ->
 ## 3D Rendering functions ##
 
 # Backface Culling
-winding = (camera,face,mesh) ->
-	area = 0
+winding = (camera, face, mesh) ->
 	prev = camera.project Matrix.multiply mesh.verts[face[0]],mesh.matrix
-	for i in [0...face.length-1]
-		dep = camera.project Matrix.multiply mesh.verts[face[i]],mesh.matrix
-		des = camera.project Matrix.multiply mesh.verts[face[i+1]],mesh.matrix
-		area += ((dep[0]-prev[0]) * (prev[1]-des[1])) - ((des[0]-prev[0]) * (prev[1]-dep[1]))
+	dep = camera.project Matrix.multiply mesh.verts[face[1]],mesh.matrix
+	des = camera.project Matrix.multiply mesh.verts[face[2]],mesh.matrix
+	area = ((dep[0]-prev[0]) * (prev[1]-des[1])) - ((des[0]-prev[0]) * (prev[1]-dep[1]))
 	return area > 0
 
 class Camera
@@ -84,7 +76,7 @@ class Meshes
 		         [ 0.5, 0.5,-0.5,1],[ 0.5, 0.5, 0.5,1]]
 		faces = [[0,1,3,2],[1,5,7,3],[2,3,7,6],
 		         [4,6,7,5],[0,2,6,4],[0,4,5,1]]
-		verts = verts.map (v) -> applyRot v, rotation
+		verts = verts.map (v) -> MathUtil.applyRot v, rotation
 		faces = triangulateQuads faces
 		matrix = Matrix.fromTransform position, scale
 		return {matrix, verts, faces}

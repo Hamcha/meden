@@ -20,8 +20,12 @@ Meden Software Renderer
 		<input type="checkbox" onChange="switchVar('fill',this.checked)" checked /> Fill
 	</div>
 	<h3>Output buffer <span id="fps"></span></h3>
-	<div id="canvas"></div>
+	<div id="canvas">
+		<h1 id="loading">Loading models..</h1>
+	</div>
 	<footer><h4>Developed by <a href="http://padrepio.in">Hamcha</a>.</h4></footer>
+	<script src="lib/evil.js"></script>
+	<script src="js/objloader.js"></script>
 	<script src="js/buffer.js"></script>
 	<script src="js/math.js"></script>
 	<script src="js/renderer.js"></script>
