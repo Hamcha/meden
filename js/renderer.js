@@ -114,7 +114,9 @@
       verts = verts.map(function(v) {
         return applyRot(v, rotation);
       });
-      faces = triangulateQuads(faces);
+      if (window.triangulate) {
+        faces = triangulateQuads(faces);
+      }
       matrix = Matrix.fromTransform(position, scale);
       return {
         matrix: matrix,

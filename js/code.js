@@ -20,6 +20,8 @@
         return meden.options.wireframe = value;
       case 'culling':
         return meden.options.culling = value;
+      case 'triangulate':
+        return window.triangulate = value;
       default:
         return console.warn("Unknown option: " + varname);
     }
@@ -36,6 +38,8 @@
   window.meden = new Renderer(ctx, w, h);
 
   meden.options.wireframe = true;
+
+  window.triangulate = true;
 
   document.getElementById("canvas").appendChild(c);
 

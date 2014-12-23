@@ -16,6 +16,7 @@ window.switchVar = (varname, value) ->
 	switch varname
 		when 'wireframe' then meden.options.wireframe = value
 		when 'culling' then meden.options.culling = value
+		when 'triangulate' then window.triangulate = value
 		else console.warn "Unknown option: " + varname
 
 # Init render canvas
@@ -26,6 +27,7 @@ ctx = c.getContext "2d"
 
 window.meden = new Renderer ctx, w, h
 meden.options.wireframe = true
+window.triangulate = true
 
 document.getElementById("canvas").appendChild c
 renderLoop()
