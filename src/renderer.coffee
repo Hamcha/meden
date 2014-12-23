@@ -51,9 +51,9 @@ class Renderer
 		color = [255,255,255]
 		for face in mesh.faces
 			continue if @options.culling and not winding @camera, face, mesh
-			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]],mesh.matrix
+			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]], mesh.matrix
 			dp1 = @camera.project Matrix.multiply mesh.verts[face[1]], mesh.matrix
-			dp2 = @camera.project Matrix.multiply mesh.verts[face[2]],   mesh.matrix
+			dp2 = @camera.project Matrix.multiply mesh.verts[face[2]], mesh.matrix
 			if @options.fill
 				@img.triangle dp0[..], dp1[..], dp2[..], color
 			if @options.wireframe

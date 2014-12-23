@@ -1,15 +1,32 @@
 (function() {
-  var c, ctx, h, renderLoop, t, w, _ref;
+  var c, captureInterval, ctx, fpscont, frameCount, h, renderLoop, start, t, w, _ref;
 
   _ref = [640, 480], w = _ref[0], h = _ref[1];
 
+  start = Date.now();
+
+  frameCount = 0;
+
+  captureInterval = 2000;
+
+  fpscont = document.getElementById("fps");
+
   renderLoop = function() {
-    var t;
-    t = Date.now() / 1000;
+    var elapsed, now, t;
+    now = Date.now();
+    t = now / 1000;
+    elapsed = now - start;
     requestAnimationFrame(renderLoop);
     meden.clear();
     meden.draw(Meshes.cube([0, 0, 20], [t * 2, t, t / 2], [3, 3, 3]));
-    return meden.show();
+    meden.show();
+    frameCount++;
+    if (elapsed > captureInterval) {
+      frameCount = frameCount * 1000 / elapsed;
+      fpscont.innerHTML = "(" + Math.round(frameCount) + " FPS)";
+      frameCount = 0;
+      return start = now;
+    }
   };
 
   t = Date.now();

@@ -1,5 +1,5 @@
 # Absolute pixel
-px = (p) -> Math.floor(p)
+px = (p) -> p|0
 
 class Buffer
 	constructor: (@ctx, @w, @h) ->
@@ -50,36 +50,33 @@ class Buffer
 		dx1 = if B[1]-A[1] > 0 then (B[0]-A[0])/(B[1]-A[1]) else 0
 		dx2 = if C[1]-A[1] > 0 then (C[0]-A[0])/(C[1]-A[1]) else 0
 		dx3 = if C[1]-B[1] > 0 then (C[0]-B[0])/(C[1]-B[1]) else 0
-		E = [A[0], A[1]]
-		S = [E[0], E[1]]
+		end = start = A[0]
+		line = A[1]
 		if dx1 > dx2
-			while S[1] <= B[1]
-				@_horline px(S[0]), px(E[0]), px(S[1]),c 
-				S[1]++
-				E[1]++
-				S[0] += dx2
-				E[0] += dx1
-			E = B
-			while S[1] <= C[1]
-				@_horline px(S[0]), px(E[0]), px(S[1]),c 
-				S[1]++
-				E[1]++
-				S[0] += dx2
-				E[0] += dx3
+			while line <= B[1]
+				@_horline px(start), px(end), px(line), c
+				start += dx2
+				end += dx1
+				line++
+			end = B[0]
+			while line <= C[1]
+				@_horline px(start), px(end), px(line), c
+				start += dx2
+				end += dx3
+				line++
 		else
-			while S[1] <= B[1]
-				@_horline px(S[0]), px(E[0]), px(S[1]),c 
-				S[1]++
-				E[1]++
-				S[0] += dx1
-				E[0] += dx2
-			S = B
-			while S[1] <= C[1]
-				@_horline px(S[0]), px(E[0]), px(S[1]),c 
-				S[1]++
-				E[1]++
-				S[0] += dx3
-				E[0] += dx2
+			while line <= B[1]
+				@_horline px(start), px(end), px(line), c
+				start += dx1
+				end += dx2
+				line++
+			start = B[0]
+			while line <= C[1]
+				@_horline px(start), px(end), px(line), c
+				start += dx3
+				end += dx2
+				line++
+		return
 
 
 	clear: () ->

@@ -2,12 +2,26 @@
 
 [w,h] = [640,480] # Resolution
 
+start = Date.now()
+frameCount = 0
+captureInterval = 2000
+fpscont = document.getElementById "fps"
 renderLoop = () ->
-	t = Date.now()/1000
+	now = Date.now()
+	t = now/1000
+	elapsed = now - start
 	requestAnimationFrame renderLoop
+
 	meden.clear()
 	meden.draw Meshes.cube [0,0,20], [t*2,t,t/2], [3,3,3]
 	meden.show()
+
+	frameCount++
+	if elapsed > captureInterval
+		frameCount = frameCount * 1000 / elapsed
+		fpscont.innerHTML = "(" + Math.round(frameCount) + " FPS)"
+		frameCount = 0
+		start = now
 
 # Time variable
 t = Date.now()

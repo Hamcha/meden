@@ -2,7 +2,7 @@
   var Buffer, px;
 
   px = function(p) {
-    return Math.floor(p);
+    return p | 0;
   };
 
   Buffer = (function() {
@@ -60,51 +60,43 @@
     };
 
     Buffer.prototype.triangle = function(v1, v2, v3, c) {
-      var A, B, C, E, S, dx1, dx2, dx3, _ref, _results, _results1;
+      var A, B, C, dx1, dx2, dx3, end, line, start, _ref;
       _ref = [v1, v2, v3].sort(function(a, b) {
         return a[1] - b[1];
       }), A = _ref[0], B = _ref[1], C = _ref[2];
       dx1 = B[1] - A[1] > 0 ? (B[0] - A[0]) / (B[1] - A[1]) : 0;
       dx2 = C[1] - A[1] > 0 ? (C[0] - A[0]) / (C[1] - A[1]) : 0;
       dx3 = C[1] - B[1] > 0 ? (C[0] - B[0]) / (C[1] - B[1]) : 0;
-      E = [A[0], A[1]];
-      S = [E[0], E[1]];
+      end = start = A[0];
+      line = A[1];
       if (dx1 > dx2) {
-        while (S[1] <= B[1]) {
-          this._horline(px(S[0]), px(E[0]), px(S[1]), c);
-          S[1]++;
-          E[1]++;
-          S[0] += dx2;
-          E[0] += dx1;
+        while (line <= B[1]) {
+          this._horline(px(start), px(end), px(line), c);
+          start += dx2;
+          end += dx1;
+          line++;
         }
-        E = B;
-        _results = [];
-        while (S[1] <= C[1]) {
-          this._horline(px(S[0]), px(E[0]), px(S[1]), c);
-          S[1]++;
-          E[1]++;
-          S[0] += dx2;
-          _results.push(E[0] += dx3);
+        end = B[0];
+        while (line <= C[1]) {
+          this._horline(px(start), px(end), px(line), c);
+          start += dx2;
+          end += dx3;
+          line++;
         }
-        return _results;
       } else {
-        while (S[1] <= B[1]) {
-          this._horline(px(S[0]), px(E[0]), px(S[1]), c);
-          S[1]++;
-          E[1]++;
-          S[0] += dx1;
-          E[0] += dx2;
+        while (line <= B[1]) {
+          this._horline(px(start), px(end), px(line), c);
+          start += dx1;
+          end += dx2;
+          line++;
         }
-        S = B;
-        _results1 = [];
-        while (S[1] <= C[1]) {
-          this._horline(px(S[0]), px(E[0]), px(S[1]), c);
-          S[1]++;
-          E[1]++;
-          S[0] += dx3;
-          _results1.push(E[0] += dx2);
+        start = B[0];
+        while (line <= C[1]) {
+          this._horline(px(start), px(end), px(line), c);
+          start += dx3;
+          end += dx2;
+          line++;
         }
-        return _results1;
       }
     };
 
