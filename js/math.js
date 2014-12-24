@@ -1,5 +1,5 @@
 (function() {
-  var MathUtil, Matrix, cos, sin;
+  var MathUtil, Matrix, Vector, cos, sin;
 
   cos = Math.cos;
 
@@ -19,7 +19,28 @@
       return vertex;
     };
 
+    MathUtil.vecfloor = function(v) {
+      return [v[0] | 0, v[1] | 0, v[2] | 0, v[3] | 0];
+    };
+
     return MathUtil;
+
+  })();
+
+  Vector = (function() {
+    function Vector() {}
+
+    Vector.normalize = function(v) {
+      var len;
+      len = Math.sqrt(v[0] + v[1] + v[2] + v[3]);
+      return [v[0] / len, v[1] / len, v[2] / len, v[3] / len];
+    };
+
+    Vector.scale = function(v, s) {
+      return [v[0] * s, v[1] * s, v[2] * s, v[3] * s];
+    };
+
+    return Vector;
 
   })();
 
@@ -60,6 +81,8 @@
   })();
 
   window.MathUtil = MathUtil;
+
+  window.Vector = Vector;
 
   window.Matrix = Matrix;
 

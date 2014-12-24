@@ -40,23 +40,23 @@ class Renderer
 		return
 
 	draw: (mesh) ->
-		color = [255,255,255]
 		vx = []
 		for face in mesh.faces
 			continue if @options.culling and not winding @camera, face, mesh
 			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]], mesh.matrix
 			dp1 = @camera.project Matrix.multiply mesh.verts[face[1]], mesh.matrix
 			dp2 = @camera.project Matrix.multiply mesh.verts[face[2]], mesh.matrix
-			vx.push [dp0, dp1, dp2]
+			color = MathUtil.vecfloor Vector.scale (Vector.normalize [face[0],face[1],face[2],1]), 255
+			vx.push [dp0, dp1, dp2, color]
 		if @options.fill
 			for dp in vx
-				@img.triangle dp[0][..], dp[1][..], dp[2][..], color
+				@img.triangle dp[0][..], dp[1][..], dp[2][..], dp[3][..]
 		if @options.wireframe
 			for dp in vx
 				if @options.fill
-					wirecolor = [255 - color[0], 255 - color[1], 255 - color[2]]
+					wirecolor = [255 - dp[3][0], 255 - dp[3][1], 255 - dp[3][2]]
 				else
-					wirecolor = color
+					wirecolor = [255,255,255]
 				@img.line dp[0][0],dp[0][1],dp[1][0],dp[1][1],wirecolor
 				@img.line dp[1][0],dp[1][1],dp[2][0],dp[2][1],wirecolor
 				@img.line dp[2][0],dp[2][1],dp[0][0],dp[0][1],wirecolor

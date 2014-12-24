@@ -13,6 +13,19 @@ class MathUtil
 		vertex = Matrix.multiply vertex, Matrix.rotateZ rotation[2]
 		return vertex
 
+	# Vector float->int
+	@vecfloor: (v) ->
+		[v[0]|0, v[1]|0, v[2]|0, v[3]|0]
+
+class Vector
+	# Normalize vector
+	@normalize: (v) ->
+		len = Math.sqrt v[0] + v[1] + v[2] + v[3]
+		return [v[0] / len, v[1] / len, v[2] / len, v[3] / len]
+	# Multiply by scalar
+	@scale: (v,s) ->
+		[v[0] * s, v[1] * s, v[2] * s, v[3] * s]
+
 class Matrix
 	# Multiply Vector4 (c) by Matrix4x4 (m)
 	@multiply: (c, m) ->
@@ -58,4 +71,5 @@ class Matrix
 		        [ 0, 0, 1, 0 ]]
 
 window.MathUtil = MathUtil
+window.Vector = Vector
 window.Matrix = Matrix

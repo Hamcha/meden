@@ -61,7 +61,6 @@
 
     Renderer.prototype.draw = function(mesh) {
       var color, dp, dp0, dp1, dp2, face, vx, wirecolor, _i, _j, _k, _len, _len1, _len2, _ref;
-      color = [255, 255, 255];
       vx = [];
       _ref = mesh.faces;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -72,21 +71,22 @@
         dp0 = this.camera.project(Matrix.multiply(mesh.verts[face[0]], mesh.matrix));
         dp1 = this.camera.project(Matrix.multiply(mesh.verts[face[1]], mesh.matrix));
         dp2 = this.camera.project(Matrix.multiply(mesh.verts[face[2]], mesh.matrix));
-        vx.push([dp0, dp1, dp2]);
+        color = MathUtil.vecfloor(Vector.scale(Vector.normalize([face[0], face[1], face[2], 1]), 255));
+        vx.push([dp0, dp1, dp2, color]);
       }
       if (this.options.fill) {
         for (_j = 0, _len1 = vx.length; _j < _len1; _j++) {
           dp = vx[_j];
-          this.img.triangle(dp[0].slice(0), dp[1].slice(0), dp[2].slice(0), color);
+          this.img.triangle(dp[0].slice(0), dp[1].slice(0), dp[2].slice(0), dp[3].slice(0));
         }
       }
       if (this.options.wireframe) {
         for (_k = 0, _len2 = vx.length; _k < _len2; _k++) {
           dp = vx[_k];
           if (this.options.fill) {
-            wirecolor = [255 - color[0], 255 - color[1], 255 - color[2]];
+            wirecolor = [255 - dp[3][0], 255 - dp[3][1], 255 - dp[3][2]];
           } else {
-            wirecolor = color;
+            wirecolor = [255, 255, 255];
           }
           this.img.line(dp[0][0], dp[0][1], dp[1][0], dp[1][1], wirecolor);
           this.img.line(dp[1][0], dp[1][1], dp[2][0], dp[2][1], wirecolor);
