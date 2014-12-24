@@ -26,12 +26,12 @@ class Camera
 	project: (coord) ->
 		pcoord = Matrix.multiply coord, @matrix
 		pcoord = [(pcoord[0] * @width  / pcoord[2]) + @width /2,
-		          (pcoord[1] * @height / pcoord[2]) + @height/2]
+		          (pcoord[1] * @height / pcoord[2]) + @height/2,
+		      	   pcoord[2]]
 
 class Renderer
 	constructor: (@ctx, @width, @height) ->
-		@depth = new Buffer ctx, width, height
-		@img   = new Buffer ctx, width, height
+		@img = new Buffer ctx, width, height
 		@options =
 			wireframe : false
 			fill: true
@@ -57,9 +57,9 @@ class Renderer
 					wirecolor = [255 - dp[3][0], 255 - dp[3][1], 255 - dp[3][2]]
 				else
 					wirecolor = [255,255,255]
-				@img.line dp[0][0],dp[0][1],dp[1][0],dp[1][1],wirecolor
-				@img.line dp[1][0],dp[1][1],dp[2][0],dp[2][1],wirecolor
-				@img.line dp[2][0],dp[2][1],dp[0][0],dp[0][1],wirecolor
+				@img.line dp[0],dp[1],wirecolor
+				@img.line dp[1],dp[2],wirecolor
+				@img.line dp[2],dp[0],wirecolor
 		return
 
 	clear: ->

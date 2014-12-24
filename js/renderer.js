@@ -36,7 +36,7 @@
     Camera.prototype.project = function(coord) {
       var pcoord;
       pcoord = Matrix.multiply(coord, this.matrix);
-      return pcoord = [(pcoord[0] * this.width / pcoord[2]) + this.width / 2, (pcoord[1] * this.height / pcoord[2]) + this.height / 2];
+      return pcoord = [(pcoord[0] * this.width / pcoord[2]) + this.width / 2, (pcoord[1] * this.height / pcoord[2]) + this.height / 2, pcoord[2]];
     };
 
     return Camera;
@@ -48,7 +48,6 @@
       this.ctx = ctx;
       this.width = width;
       this.height = height;
-      this.depth = new Buffer(ctx, width, height);
       this.img = new Buffer(ctx, width, height);
       this.options = {
         wireframe: false,
@@ -88,9 +87,9 @@
           } else {
             wirecolor = [255, 255, 255];
           }
-          this.img.line(dp[0][0], dp[0][1], dp[1][0], dp[1][1], wirecolor);
-          this.img.line(dp[1][0], dp[1][1], dp[2][0], dp[2][1], wirecolor);
-          this.img.line(dp[2][0], dp[2][1], dp[0][0], dp[0][1], wirecolor);
+          this.img.line(dp[0], dp[1], wirecolor);
+          this.img.line(dp[1], dp[2], wirecolor);
+          this.img.line(dp[2], dp[0], wirecolor);
         }
       }
     };

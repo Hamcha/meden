@@ -17,6 +17,8 @@ class MathUtil
 	@vecfloor: (v) ->
 		[v[0]|0, v[1]|0, v[2]|0, v[3]|0]
 
+	@lerp: (a,b,t) -> a + (b - a) * t
+
 class Vector
 	# Normalize vector
 	@normalize: (v) ->

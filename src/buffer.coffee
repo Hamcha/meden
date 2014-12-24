@@ -7,15 +7,26 @@ class Buffer
 		@bf  = new ArrayBuffer @src.data.length
 		@b8  = new Uint8ClampedArray @bf
 		@b32 = new Uint32Array @bf
+		@depth = new ArrayBuffer @src.data.length
+		return
+
+	createDepth: () ->
 		return
 
 	setPixel: (x,y,c) ->
-		return if x < 0 or x >= @w or y < 0 or y >= @h
+		return false if x < 0 or x >= @w or y < 0 or y >= @h
 		@b32[y*@w+x] = (255  << 24) |
 		               (c[2] << 16) |
 		               (c[1] << 8)  |
 		                c[0]
-		return
+		return true
+
+	setPixelDepth: (x,y,z,c) ->
+		return false unless @depth?
+		return false if @depth[y*@w+x] < z
+		@setPixel x,y,c
+		@depth[y*@w+x] = z
+		return true
 
 	getPixel: (x,y) -> 
 		[@b8[y*@w+x], @b8[y*@w+x+1], @b8[y*@w+x+2]]
@@ -23,10 +34,18 @@ class Buffer
 	_horline: (x1, x2, y, c) ->
 		@setPixel i,y,c for i in [x1..x2]
 		return
+
+	_horlineDepth: (x1, z1, x2, z2, y, c) ->
+		dz = (z2 - z1)/(x2 - x1)
+		z = z1
+		for i in [x1..x2]
+			break unless @setPixelDepth i,y,z,c
+			z += dz
+		return
 	
 	# Brasenham algorithm
-	line: (x1, y1, x2, y2, c) ->
-		[x1, y1, x2, y2] = [px(x1), px(y1), px(x2), px(y2)]
+	line: (v1, v2, c) ->
+		[x1, y1, x2, y2] = [px(v1[0]), px(v1[1]), px(v2[0]), px(v2[1])]
 		[dx, dy] = [Math.abs(x2 - x1), Math.abs(y2 - y1)]
 		sx = if x1 < x2 then 1 else -1
 		sy = if y1 < y2 then 1 else -1
@@ -47,40 +66,83 @@ class Buffer
 	# http://www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
 	triangle: (v1, v2, v3, c) ->
 		[A, B, C] = [v1, v2, v3].sort (a, b) -> a[1]-b[1]
-		dx1 = if B[1]-A[1] > 0 then (B[0]-A[0])/(B[1]-A[1]) else 0
-		dx2 = if C[1]-A[1] > 0 then (C[0]-A[0])/(C[1]-A[1]) else 0
-		dx3 = if C[1]-B[1] > 0 then (C[0]-B[0])/(C[1]-B[1]) else 0
+		
+		if B[1]-A[1] > 0
+			dx1 = (B[0]-A[0])/(B[1]-A[1])
+			dz1 = (B[2]-A[2])/(B[1]-A[1])
+		else
+			dx1 = dz1 = 0
+
+		if C[1]-A[1] > 0
+			dx2 = (C[0]-A[0])/(C[1]-A[1])
+			dz2 = (C[2]-A[2])/(C[1]-A[1])
+		else
+			dx2 = dz2 = 0
+		
+		if C[1]-B[1] > 0
+			dx3 = (C[0]-B[0])/(C[1]-B[1])
+			dz3 = (C[2]-B[2])/(C[1]-B[1])
+		else
+			dx3 = dz3 = 0
 		end = start = A[0]
+		endD = startD = A[2]
 		line = A[1]
 		if dx1 > dx2
 			while line <= B[1]
-				@_horline px(start), px(end), px(line), c
+				if end - start > 0
+					dz = (endD - startD)/(end - start)
+				else
+					dz = 0
+				point = start
+				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx2
 				end += dx1
+				startD += dz2
+				endD += dz1
 				line++
 			end = B[0]
 			while line <= C[1]
-				@_horline px(start), px(end), px(line), c
+				if end - start > 0
+					dz = (endD - startD)/(end - start)
+				else
+					dz = 0
+				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx2
 				end += dx3
+				startD += dz2
+				endD += dz3
 				line++
 		else
 			while line <= B[1]
-				@_horline px(start), px(end), px(line), c
+				if end - start > 0
+					dz = (endD - startD)/(end - start)
+				else
+					dz = 0
+				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx1
 				end += dx2
+				startD += dz1
+				endD += dz2
 				line++
 			start = B[0]
 			while line <= C[1]
-				@_horline px(start), px(end), px(line), c
+				if end - start > 0
+					dz = (endD - startD)/(end - start)
+				else
+					dz = 0
+				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx3
 				end += dx2
+				startD += dz3
+				endD += dz2
 				line++
 		return
 
 
 	clear: () ->
-		@b32[i] = -16777216 for i in [0...@b32.length]
+		for i in [0...@b32.length]
+			@b32[i] = -16777216 
+			@depth[i] = Infinity
 		return
 
 window.Buffer = Buffer

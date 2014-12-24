@@ -23,6 +23,10 @@
       return [v[0] | 0, v[1] | 0, v[2] | 0, v[3] | 0];
     };
 
+    MathUtil.lerp = function(a, b, t) {
+      return a + (b - a) * t;
+    };
+
     return MathUtil;
 
   })();
