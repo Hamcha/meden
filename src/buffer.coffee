@@ -39,7 +39,7 @@ class Buffer
 		dz = (z2 - z1)/(x2 - x1)
 		z = z1
 		for i in [x1..x2]
-			break unless @setPixelDepth i,y,z,c
+			@setPixelDepth i,y,z,c
 			z += dz
 		return
 	
@@ -89,10 +89,6 @@ class Buffer
 		line = A[1]
 		if dx1 > dx2
 			while line <= B[1]
-				if end - start > 0
-					dz = (endD - startD)/(end - start)
-				else
-					dz = 0
 				point = start
 				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx2
@@ -102,10 +98,6 @@ class Buffer
 				line++
 			end = B[0]
 			while line <= C[1]
-				if end - start > 0
-					dz = (endD - startD)/(end - start)
-				else
-					dz = 0
 				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx2
 				end += dx3
@@ -114,10 +106,6 @@ class Buffer
 				line++
 		else
 			while line <= B[1]
-				if end - start > 0
-					dz = (endD - startD)/(end - start)
-				else
-					dz = 0
 				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx1
 				end += dx2
@@ -126,10 +114,6 @@ class Buffer
 				line++
 			start = B[0]
 			while line <= C[1]
-				if end - start > 0
-					dz = (endD - startD)/(end - start)
-				else
-					dz = 0
 				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx3
 				end += dx2

@@ -56,9 +56,7 @@
       dz = (z2 - z1) / (x2 - x1);
       z = z1;
       for (i = _i = x1; x1 <= x2 ? _i <= x2 : _i >= x2; i = x1 <= x2 ? ++_i : --_i) {
-        if (!this.setPixelDepth(i, y, z, c)) {
-          break;
-        }
+        this.setPixelDepth(i, y, z, c);
         z += dz;
       }
     };
@@ -88,7 +86,7 @@
     };
 
     Buffer.prototype.triangle = function(v1, v2, v3, c) {
-      var A, B, C, dx1, dx2, dx3, dz, dz1, dz2, dz3, end, endD, line, point, start, startD, _ref;
+      var A, B, C, dx1, dx2, dx3, dz1, dz2, dz3, end, endD, line, point, start, startD, _ref;
       _ref = [v1, v2, v3].sort(function(a, b) {
         return a[1] - b[1];
       }), A = _ref[0], B = _ref[1], C = _ref[2];
@@ -115,11 +113,6 @@
       line = A[1];
       if (dx1 > dx2) {
         while (line <= B[1]) {
-          if (end - start > 0) {
-            dz = (endD - startD) / (end - start);
-          } else {
-            dz = 0;
-          }
           point = start;
           this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
           start += dx2;
@@ -130,11 +123,6 @@
         }
         end = B[0];
         while (line <= C[1]) {
-          if (end - start > 0) {
-            dz = (endD - startD) / (end - start);
-          } else {
-            dz = 0;
-          }
           this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
           start += dx2;
           end += dx3;
@@ -144,11 +132,6 @@
         }
       } else {
         while (line <= B[1]) {
-          if (end - start > 0) {
-            dz = (endD - startD) / (end - start);
-          } else {
-            dz = 0;
-          }
           this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
           start += dx1;
           end += dx2;
@@ -158,11 +141,6 @@
         }
         start = B[0];
         while (line <= C[1]) {
-          if (end - start > 0) {
-            dz = (endD - startD) / (end - start);
-          } else {
-            dz = 0;
-          }
           this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
           start += dx3;
           end += dx2;
