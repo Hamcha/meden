@@ -34,9 +34,9 @@
     }
 
     Camera.prototype.project = function(coord) {
-      var pcoord;
-      pcoord = Matrix.multiply(coord, this.matrix);
-      return pcoord = [(pcoord[0] * this.width / pcoord[2]) + this.width / 2, (pcoord[1] * this.height / pcoord[2]) + this.height / 2, pcoord[2]];
+      var pcoord, x, y, z, _ref;
+      _ref = Matrix.multiply(coord, this.matrix), x = _ref[0], y = _ref[1], z = _ref[2];
+      return pcoord = [(x * this.width / z) + this.width / 2, (y * this.height / z) + this.height / 2, z];
     };
 
     return Camera;
@@ -59,7 +59,7 @@
     }
 
     Renderer.prototype.draw = function(mesh) {
-      var color, dp, dp0, dp1, dp2, face, vx, wirecolor, _i, _j, _k, _len, _len1, _len2, _ref;
+      var dp, dp0, dp1, dp2, face, vx, wirecolor, _i, _j, _k, _len, _len1, _len2, _ref;
       vx = [];
       _ref = mesh.faces;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -70,23 +70,18 @@
         dp0 = this.camera.project(Matrix.multiply(mesh.verts[face[0]], mesh.matrix));
         dp1 = this.camera.project(Matrix.multiply(mesh.verts[face[1]], mesh.matrix));
         dp2 = this.camera.project(Matrix.multiply(mesh.verts[face[2]], mesh.matrix));
-        color = MathUtil.vecfloor(Vector.scale(Vector.normalize([face[0], face[1], face[2], 1]), 255));
-        vx.push([dp0, dp1, dp2, color]);
+        vx.push([dp0, dp1, dp2]);
       }
       if (this.options.fill) {
         for (_j = 0, _len1 = vx.length; _j < _len1; _j++) {
           dp = vx[_j];
-          this.img.triangle(dp[0].slice(0), dp[1].slice(0), dp[2].slice(0), dp[3].slice(0));
+          this.img.triangle(dp[0].slice(0), dp[1].slice(0), dp[2].slice(0), [255, 255, 255]);
         }
       }
       if (this.options.wireframe) {
+        wirecolor = this.options.fill ? [0, 0, 0] : [255, 255, 255];
         for (_k = 0, _len2 = vx.length; _k < _len2; _k++) {
           dp = vx[_k];
-          if (this.options.fill) {
-            wirecolor = [0, 0, 0];
-          } else {
-            wirecolor = [255, 255, 255];
-          }
           this.img.line(dp[0], dp[1], wirecolor);
           this.img.line(dp[1], dp[2], wirecolor);
           this.img.line(dp[2], dp[0], wirecolor);

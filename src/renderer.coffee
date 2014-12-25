@@ -12,8 +12,8 @@ triangulateQuads = (faces) ->
 # Backface Culling
 winding = (camera, face, mesh) ->
 	prev = camera.project Matrix.multiply mesh.verts[face[0]],mesh.matrix
-	dep = camera.project Matrix.multiply mesh.verts[face[1]],mesh.matrix
-	des = camera.project Matrix.multiply mesh.verts[face[2]],mesh.matrix
+	dep  = camera.project Matrix.multiply mesh.verts[face[1]],mesh.matrix
+	des  = camera.project Matrix.multiply mesh.verts[face[2]],mesh.matrix
 	area = ((dep[0]-prev[0]) * (prev[1]-des[1])) - ((des[0]-prev[0]) * (prev[1]-dep[1]))
 	return area > 0
 
@@ -24,10 +24,10 @@ class Camera
 		return
 
 	project: (coord) ->
-		pcoord = Matrix.multiply coord, @matrix
-		pcoord = [(pcoord[0] * @width  / pcoord[2]) + @width /2,
-		          (pcoord[1] * @height / pcoord[2]) + @height/2,
-		      	   pcoord[2]]
+		[x, y, z] = Matrix.multiply coord, @matrix
+		pcoord = [(x * @width  / z) + @width  / 2,
+		          (y * @height / z) + @height / 2,
+		      	   z]
 
 class Renderer
 	constructor: (@ctx, @width, @height) ->
@@ -46,17 +46,13 @@ class Renderer
 			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]], mesh.matrix
 			dp1 = @camera.project Matrix.multiply mesh.verts[face[1]], mesh.matrix
 			dp2 = @camera.project Matrix.multiply mesh.verts[face[2]], mesh.matrix
-			color = MathUtil.vecfloor Vector.scale (Vector.normalize [face[0],face[1],face[2],1]), 255
-			vx.push [dp0, dp1, dp2, color]
+			vx.push [dp0, dp1, dp2]
 		if @options.fill
 			for dp in vx
-				@img.triangle dp[0][..], dp[1][..], dp[2][..], dp[3][..]
+				@img.triangle dp[0][..], dp[1][..], dp[2][..], [255,255,255]
 		if @options.wireframe
+			wirecolor =	if @options.fill then [0,0,0] else [255,255,255]
 			for dp in vx
-				if @options.fill
-					wirecolor = [0,0,0]
-				else
-					wirecolor = [255,255,255]
 				@img.line dp[0],dp[1],wirecolor
 				@img.line dp[1],dp[2],wirecolor
 				@img.line dp[2],dp[0],wirecolor

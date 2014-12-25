@@ -31,8 +31,9 @@ class Buffer
 		@setPixel x,y,c
 		return true
 
-	getPixel: (x,y) -> 
-		[@b8[y*@w+x], @b8[y*@w+x+1], @b8[y*@w+x+2]]
+	getPixel: (x,y) ->
+		offset = y * @w + x
+		[@b8[offset], @b8[offset+1], @b8[offset+2]]
 
 	_horline: (x1, x2, y, c) ->
 		@setPixel i,y,c for i in [x1..x2]
@@ -45,60 +46,70 @@ class Buffer
 			@setPixelDepth i,y,z,c
 			z += dz
 		return
-	
+
 	# Brasenham algorithm
 	line: (v1, v2, c) ->
 		[x1, y1, z1, x2, y2, z2] = [px(v1[0]), px(v1[1]), v1[2], px(v2[0]), px(v2[1]), v2[2]]
 		[dx, dy] = [Math.abs(x2 - x1), Math.abs(y2 - y1)]
 		sx = if x1 < x2 then 1 else -1
 		sy = if y1 < y2 then 1 else -1
-		err = dx-dy
+		err = dx - dy
 		[x, y] = [x1, y1]
 		points = []
 		while true
 			points.push [x, y]
 			break if (x is x2) and (y is y2)
-			e2 = 2*err
+			e2 = 2 * err
 			if e2 > -dy
 				err -= dy
 				x += sx
 			if e2 <  dx
 				err += dx
 				y += sy
-		z = z1 - 0.01
-		dz = (z2-z1)/points.length
+		z = z1 - 0.04
+		dz = (z2 - z1) / points.length
 		for p in points
 			@setPixelDepth p[0], p[1], z, c
 			z += dz
 		return
 
-	# Scanline triangle fill algorithm 
+	# Scanline triangle fill algorithm
 	# http://www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
 	triangle: (v1, v2, v3, c) ->
 		[A, B, C] = [v1, v2, v3].sort (a, b) -> a[1]-b[1]
-		
-		if B[1]-A[1] > 0
-			dx1 = (B[0]-A[0])/(B[1]-A[1])
-			dz1 = (B[2]-A[2])/(B[1]-A[1])
+		[Ax, Ay, Az] = A
+		[Bx, By, Bz] = B
+		[Cx, Cy, Cz] = C
+
+		d1 = By - Ay
+		if d1 > 0
+			div = 1 / d1
+			dx1 = (Bx - Ax) * div
+			dz1 = (Bz - Az) * div
 		else
 			dx1 = dz1 = 0
 
-		if C[1]-A[1] > 0
-			dx2 = (C[0]-A[0])/(C[1]-A[1])
-			dz2 = (C[2]-A[2])/(C[1]-A[1])
+		d2 = Cy - Ay
+		if d2 > 0
+			div = 1 / d2
+			dx2 = (Cx - Ax) * div
+			dz2 = (Cz - Az) * div
 		else
 			dx2 = dz2 = 0
-		
-		if C[1]-B[1] > 0
-			dx3 = (C[0]-B[0])/(C[1]-B[1])
-			dz3 = (C[2]-B[2])/(C[1]-B[1])
+
+		d3 = Cy - By
+		if d3 > 0
+			div = 1 / d3
+			dx3 = (Cx - Bx) * div
+			dz3 = (Cz - Bz) * div
 		else
 			dx3 = dz3 = 0
-		end = start = A[0]
-		endD = startD = A[2]
-		line = A[1]
+
+		end  = start  = Ax
+		endD = startD = Az
+		line = Ay
 		if dx1 > dx2
-			while line <= B[1]
+			while line <= By
 				point = start
 				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx2
@@ -106,8 +117,8 @@ class Buffer
 				startD += dz2
 				endD += dz1
 				line++
-			end = B[0]
-			while line <= C[1]
+			end = Bx
+			while line <= Cy
 				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx2
 				end += dx3
@@ -115,15 +126,15 @@ class Buffer
 				endD += dz3
 				line++
 		else
-			while line <= B[1]
+			while line <= By
 				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx1
 				end += dx2
 				startD += dz1
 				endD += dz2
 				line++
-			start = B[0]
-			while line <= C[1]
+			start = Bx
+			while line <= Cy
 				@_horlineDepth px(start), startD, px(end), endD, px(line), c
 				start += dx3
 				end += dx2
@@ -135,7 +146,7 @@ class Buffer
 
 	clear: () ->
 		for i in [0...@b32.length]
-			@b32[i] = -16777216 
+			@b32[i] = -16777216
 			@depth[i] = Infinity
 		return
 

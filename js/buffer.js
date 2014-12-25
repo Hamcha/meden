@@ -46,7 +46,9 @@
     };
 
     Buffer.prototype.getPixel = function(x, y) {
-      return [this.b8[y * this.w + x], this.b8[y * this.w + x + 1], this.b8[y * this.w + x + 2]];
+      var offset;
+      offset = y * this.w + x;
+      return [this.b8[offset], this.b8[offset + 1], this.b8[offset + 2]];
     };
 
     Buffer.prototype._horline = function(x1, x2, y, c) {
@@ -90,7 +92,7 @@
           y += sy;
         }
       }
-      z = z1 - 0.01;
+      z = z1 - 0.04;
       dz = (z2 - z1) / points.length;
       for (_i = 0, _len = points.length; _i < _len; _i++) {
         p = points[_i];
@@ -100,33 +102,42 @@
     };
 
     Buffer.prototype.triangle = function(v1, v2, v3, c) {
-      var A, B, C, dx1, dx2, dx3, dz1, dz2, dz3, end, endD, line, point, start, startD, _ref;
+      var A, Ax, Ay, Az, B, Bx, By, Bz, C, Cx, Cy, Cz, d1, d2, d3, div, dx1, dx2, dx3, dz1, dz2, dz3, end, endD, line, point, start, startD, _ref;
       _ref = [v1, v2, v3].sort(function(a, b) {
         return a[1] - b[1];
       }), A = _ref[0], B = _ref[1], C = _ref[2];
-      if (B[1] - A[1] > 0) {
-        dx1 = (B[0] - A[0]) / (B[1] - A[1]);
-        dz1 = (B[2] - A[2]) / (B[1] - A[1]);
+      Ax = A[0], Ay = A[1], Az = A[2];
+      Bx = B[0], By = B[1], Bz = B[2];
+      Cx = C[0], Cy = C[1], Cz = C[2];
+      d1 = By - Ay;
+      if (d1 > 0) {
+        div = 1 / d1;
+        dx1 = (Bx - Ax) * div;
+        dz1 = (Bz - Az) * div;
       } else {
         dx1 = dz1 = 0;
       }
-      if (C[1] - A[1] > 0) {
-        dx2 = (C[0] - A[0]) / (C[1] - A[1]);
-        dz2 = (C[2] - A[2]) / (C[1] - A[1]);
+      d2 = Cy - Ay;
+      if (d2 > 0) {
+        div = 1 / d2;
+        dx2 = (Cx - Ax) * div;
+        dz2 = (Cz - Az) * div;
       } else {
         dx2 = dz2 = 0;
       }
-      if (C[1] - B[1] > 0) {
-        dx3 = (C[0] - B[0]) / (C[1] - B[1]);
-        dz3 = (C[2] - B[2]) / (C[1] - B[1]);
+      d3 = Cy - By;
+      if (d3 > 0) {
+        div = 1 / d3;
+        dx3 = (Cx - Bx) * div;
+        dz3 = (Cz - Bz) * div;
       } else {
         dx3 = dz3 = 0;
       }
-      end = start = A[0];
-      endD = startD = A[2];
-      line = A[1];
+      end = start = Ax;
+      endD = startD = Az;
+      line = Ay;
       if (dx1 > dx2) {
-        while (line <= B[1]) {
+        while (line <= By) {
           point = start;
           this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
           start += dx2;
@@ -135,8 +146,8 @@
           endD += dz1;
           line++;
         }
-        end = B[0];
-        while (line <= C[1]) {
+        end = Bx;
+        while (line <= Cy) {
           this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
           start += dx2;
           end += dx3;
@@ -145,7 +156,7 @@
           line++;
         }
       } else {
-        while (line <= B[1]) {
+        while (line <= By) {
           this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
           start += dx1;
           end += dx2;
@@ -153,8 +164,8 @@
           endD += dz2;
           line++;
         }
-        start = B[0];
-        while (line <= C[1]) {
+        start = Bx;
+        while (line <= Cy) {
           this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
           start += dx3;
           end += dx2;
