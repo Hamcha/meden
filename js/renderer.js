@@ -51,8 +51,7 @@
       this.img = new Buffer(ctx, width, height);
       this.options = {
         wireframe: false,
-        fill: true,
-        culling: true
+        fill: true
       };
       this.camera = new Camera(width, height, 70, 0.1, 1000);
       return;
@@ -64,7 +63,7 @@
       _ref = mesh.faces;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         face = _ref[_i];
-        if (this.options.culling && !winding(this.camera, face, mesh)) {
+        if (!winding(this.camera, face, mesh)) {
           continue;
         }
         dp0 = this.camera.project(Matrix.multiply(mesh.verts[face[0]], mesh.matrix));

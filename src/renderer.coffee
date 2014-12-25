@@ -35,14 +35,13 @@ class Renderer
 		@options =
 			wireframe : false
 			fill: true
-			culling: true
 		@camera = new Camera width, height, 70, 0.1, 1000
 		return
 
 	draw: (mesh) ->
 		vx = []
 		for face in mesh.faces
-			continue if @options.culling and not winding @camera, face, mesh
+			continue unless winding @camera, face, mesh
 			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]], mesh.matrix
 			dp1 = @camera.project Matrix.multiply mesh.verts[face[1]], mesh.matrix
 			dp2 = @camera.project Matrix.multiply mesh.verts[face[2]], mesh.matrix

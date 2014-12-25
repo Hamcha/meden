@@ -15,13 +15,8 @@
       this.b8 = new Uint8ClampedArray(this.bf);
       this.b32 = new Uint32Array(this.bf);
       this.depth = new ArrayBuffer(this.src.data.length);
-      this.options = {
-        ignoreDepth: false
-      };
       return;
     }
-
-    Buffer.prototype.createDepth = function() {};
 
     Buffer.prototype.setPixel = function(x, y, c) {
       if (x < 0 || x >= this.w || y < 0 || y >= this.h) {
@@ -32,16 +27,14 @@
     };
 
     Buffer.prototype.setPixelDepth = function(x, y, z, c) {
-      if (!this.options.ignoreDepth) {
-        if (this.depth == null) {
-          return false;
-        }
-        if (this.depth[y * this.w + x] < z) {
-          return false;
-        }
-        this.depth[y * this.w + x] = z;
+      if (this.depth == null) {
+        return false;
+      }
+      if (this.depth[y * this.w + x] < z) {
+        return false;
       }
       this.setPixel(x, y, c);
+      this.depth[y * this.w + x] = z;
       return true;
     };
 
@@ -51,31 +44,35 @@
       return [this.b8[offset], this.b8[offset + 1], this.b8[offset + 2]];
     };
 
-    Buffer.prototype._horline = function(x1, x2, y, c) {
-      var i, _i;
-      for (i = _i = x1; x1 <= x2 ? _i <= x2 : _i >= x2; i = x1 <= x2 ? ++_i : --_i) {
-        this.setPixel(i, y, c);
-      }
-    };
-
     Buffer.prototype._horlineDepth = function(x1, z1, x2, z2, y, c) {
-      var dz, i, z, _i;
+      var dz, i, z;
       dz = (z2 - z1) / (x2 - x1);
-      z = z1;
-      for (i = _i = x1; x1 <= x2 ? _i <= x2 : _i >= x2; i = x1 <= x2 ? ++_i : --_i) {
-        this.setPixelDepth(i, y, z, c);
-        z += dz;
+      z = z2;
+      i = x2 - x1;
+      if (!(i > 0)) {
+        return;
+      }
+      while (i--) {
+        this.setPixelDepth(x1 + i, y, z, c);
+        z -= dz;
       }
     };
 
     Buffer.prototype.line = function(v1, v2, c) {
-      var dx, dy, dz, e2, err, p, points, sx, sy, x, x1, x2, y, y1, y2, z, z1, z2, _i, _len, _ref, _ref1, _ref2;
-      _ref = [px(v1[0]), px(v1[1]), v1[2], px(v2[0]), px(v2[1]), v2[2]], x1 = _ref[0], y1 = _ref[1], z1 = _ref[2], x2 = _ref[3], y2 = _ref[4], z2 = _ref[5];
-      _ref1 = [Math.abs(x2 - x1), Math.abs(y2 - y1)], dx = _ref1[0], dy = _ref1[1];
+      var dx, dy, dz, e2, err, p, points, sx, sy, x, x1, x2, y, y1, y2, z, z1, z2, _i, _len;
+      x1 = px(v1[0]);
+      y1 = px(v1[1]);
+      z1 = v1[2];
+      x2 = px(v2[0]);
+      y2 = px(v2[1]);
+      z2 = v2[2];
+      dx = Math.abs(x2 - x1);
+      dy = Math.abs(y2 - y1);
       sx = x1 < x2 ? 1 : -1;
       sy = y1 < y2 ? 1 : -1;
       err = dx - dy;
-      _ref2 = [x1, y1], x = _ref2[0], y = _ref2[1];
+      x = x1;
+      y = y1;
       points = [];
       while (true) {
         points.push([x, y]);
@@ -177,8 +174,9 @@
     };
 
     Buffer.prototype.clear = function() {
-      var i, _i, _ref;
-      for (i = _i = 0, _ref = this.b32.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      var i;
+      i = this.b32.length - 1;
+      while (i--) {
         this.b32[i] = -16777216;
         this.depth[i] = Infinity;
       }

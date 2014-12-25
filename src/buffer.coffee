@@ -8,11 +8,6 @@ class Buffer
 		@b8  = new Uint8ClampedArray @bf
 		@b32 = new Uint32Array @bf
 		@depth = new ArrayBuffer @src.data.length
-		@options =
-			ignoreDepth: false
-		return
-
-	createDepth: () ->
 		return
 
 	setPixel: (x,y,c) ->
@@ -24,39 +19,47 @@ class Buffer
 		return true
 
 	setPixelDepth: (x,y,z,c) ->
-		if !@options.ignoreDepth
-			return false unless @depth?
-			return false if @depth[y*@w+x] < z
-			@depth[y*@w+x] = z
+		return false unless @depth?
+		return false if @depth[y*@w+x] < z
 		@setPixel x,y,c
+		@depth[y*@w+x] = z
 		return true
 
 	getPixel: (x,y) ->
 		offset = y * @w + x
 		[@b8[offset], @b8[offset+1], @b8[offset+2]]
 
-	_horline: (x1, x2, y, c) ->
-		@setPixel i,y,c for i in [x1..x2]
-		return
-
 	_horlineDepth: (x1, z1, x2, z2, y, c) ->
 		dz = (z2 - z1)/(x2 - x1)
-		z = z1
-		for i in [x1..x2]
-			@setPixelDepth i,y,z,c
-			z += dz
+		z = z2
+		i = x2 - x1
+		return unless i > 0
+		while i--
+			@setPixelDepth x1+i,y,z,c
+			z -= dz
 		return
 
 	# Brasenham algorithm
 	line: (v1, v2, c) ->
-		[x1, y1, z1, x2, y2, z2] = [px(v1[0]), px(v1[1]), v1[2], px(v2[0]), px(v2[1]), v2[2]]
-		[dx, dy] = [Math.abs(x2 - x1), Math.abs(y2 - y1)]
+		x1 = px v1[0]
+		y1 = px v1[1]
+		z1 =    v1[2]
+		x2 = px v2[0]
+		y2 = px v2[1]
+		z2 =    v2[2]
+
+		dx = Math.abs x2 - x1
+		dy = Math.abs y2 - y1
+
 		sx = if x1 < x2 then 1 else -1
 		sy = if y1 < y2 then 1 else -1
 		err = dx - dy
-		[x, y] = [x1, y1]
+
+		x = x1
+		y = y1
+
 		points = []
-		while true
+		loop
 			points.push [x, y]
 			break if (x is x2) and (y is y2)
 			e2 = 2 * err
@@ -145,7 +148,8 @@ class Buffer
 
 
 	clear: () ->
-		for i in [0...@b32.length]
+		i = @b32.length - 1
+		while i--
 			@b32[i] = -16777216
 			@depth[i] = Infinity
 		return

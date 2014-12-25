@@ -35,9 +35,6 @@
     switch (varname) {
       case 'wireframe':
         return meden.options.wireframe = value;
-      case 'culling':
-        meden.options.culling = value;
-        return meden.img.options.ignoreDepth = !value;
       case 'fill':
         return meden.options.fill = value;
       default:

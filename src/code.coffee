@@ -32,9 +32,6 @@ t = Date.now()
 window.switchVar = (varname, value) ->
 	switch varname
 		when 'wireframe' then meden.options.wireframe = value
-		when 'culling'
-			meden.options.culling = value
-			meden.img.options.ignoreDepth = !value
 		when 'fill' then meden.options.fill = value
 		else console.warn "Unknown option: " + varname
 
