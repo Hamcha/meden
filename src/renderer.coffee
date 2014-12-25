@@ -54,7 +54,7 @@ class Renderer
 		if @options.wireframe
 			for dp in vx
 				if @options.fill
-					wirecolor = [255 - dp[3][0], 255 - dp[3][1], 255 - dp[3][2]]
+					wirecolor = [0,0,0]
 				else
 					wirecolor = [255,255,255]
 				@img.line dp[0],dp[1],wirecolor

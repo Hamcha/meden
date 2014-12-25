@@ -45,21 +45,28 @@ class Buffer
 	
 	# Brasenham algorithm
 	line: (v1, v2, c) ->
-		[x1, y1, x2, y2] = [px(v1[0]), px(v1[1]), px(v2[0]), px(v2[1])]
+		[x1, y1, z1, x2, y2, z2] = [px(v1[0]), px(v1[1]), v1[2], px(v2[0]), px(v2[1]), v2[2]]
 		[dx, dy] = [Math.abs(x2 - x1), Math.abs(y2 - y1)]
 		sx = if x1 < x2 then 1 else -1
 		sy = if y1 < y2 then 1 else -1
 		err = dx-dy
+		[x, y] = [x1, y1]
+		points = []
 		while true
-			@setPixel x1, y1, c
-			break if (x1 is x2) and (y1 is y2)
+			points.push [x, y]
+			break if (x is x2) and (y is y2)
 			e2 = 2*err
 			if e2 > -dy
 				err -= dy
-				x1 += sx
+				x += sx
 			if e2 <  dx
 				err += dx
-				y1 += sy
+				y += sy
+		z = z1 - 0.01
+		dz = (z2-z1)/points.length
+		for p in points
+			@setPixelDepth p[0], p[1], z, c
+			z += dz
 		return
 
 	# Scanline triangle fill algorithm 

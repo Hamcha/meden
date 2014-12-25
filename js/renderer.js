@@ -83,7 +83,7 @@
         for (_k = 0, _len2 = vx.length; _k < _len2; _k++) {
           dp = vx[_k];
           if (this.options.fill) {
-            wirecolor = [255 - dp[3][0], 255 - dp[3][1], 255 - dp[3][2]];
+            wirecolor = [0, 0, 0];
           } else {
             wirecolor = [255, 255, 255];
           }

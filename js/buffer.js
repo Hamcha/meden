@@ -62,26 +62,35 @@
     };
 
     Buffer.prototype.line = function(v1, v2, c) {
-      var dx, dy, e2, err, sx, sy, x1, x2, y1, y2, _ref, _ref1;
-      _ref = [px(v1[0]), px(v1[1]), px(v2[0]), px(v2[1])], x1 = _ref[0], y1 = _ref[1], x2 = _ref[2], y2 = _ref[3];
+      var dx, dy, dz, e2, err, p, points, sx, sy, x, x1, x2, y, y1, y2, z, z1, z2, _i, _len, _ref, _ref1, _ref2;
+      _ref = [px(v1[0]), px(v1[1]), v1[2], px(v2[0]), px(v2[1]), v2[2]], x1 = _ref[0], y1 = _ref[1], z1 = _ref[2], x2 = _ref[3], y2 = _ref[4], z2 = _ref[5];
       _ref1 = [Math.abs(x2 - x1), Math.abs(y2 - y1)], dx = _ref1[0], dy = _ref1[1];
       sx = x1 < x2 ? 1 : -1;
       sy = y1 < y2 ? 1 : -1;
       err = dx - dy;
+      _ref2 = [x1, y1], x = _ref2[0], y = _ref2[1];
+      points = [];
       while (true) {
-        this.setPixel(x1, y1, c);
-        if ((x1 === x2) && (y1 === y2)) {
+        points.push([x, y]);
+        if ((x === x2) && (y === y2)) {
           break;
         }
         e2 = 2 * err;
         if (e2 > -dy) {
           err -= dy;
-          x1 += sx;
+          x += sx;
         }
         if (e2 < dx) {
           err += dx;
-          y1 += sy;
+          y += sy;
         }
+      }
+      z = z1 - 0.01;
+      dz = (z2 - z1) / points.length;
+      for (_i = 0, _len = points.length; _i < _len; _i++) {
+        p = points[_i];
+        this.setPixelDepth(p[0], p[1], z, c);
+        z += dz;
       }
     };
 
