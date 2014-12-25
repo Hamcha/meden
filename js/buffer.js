@@ -15,6 +15,9 @@
       this.b8 = new Uint8ClampedArray(this.bf);
       this.b32 = new Uint32Array(this.bf);
       this.depth = new ArrayBuffer(this.src.data.length);
+      this.options = {
+        ignoreDepth: false
+      };
       return;
     }
 
@@ -29,14 +32,16 @@
     };
 
     Buffer.prototype.setPixelDepth = function(x, y, z, c) {
-      if (this.depth == null) {
-        return false;
-      }
-      if (this.depth[y * this.w + x] < z) {
-        return false;
+      if (!this.options.ignoreDepth) {
+        if (this.depth == null) {
+          return false;
+        }
+        if (this.depth[y * this.w + x] < z) {
+          return false;
+        }
+        this.depth[y * this.w + x] = z;
       }
       this.setPixel(x, y, c);
-      this.depth[y * this.w + x] = z;
       return true;
     };
 

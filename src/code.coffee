@@ -32,7 +32,9 @@ t = Date.now()
 window.switchVar = (varname, value) ->
 	switch varname
 		when 'wireframe' then meden.options.wireframe = value
-		when 'culling' then meden.options.culling = value
+		when 'culling'
+			meden.options.culling = value
+			meden.img.options.ignoreDepth = !value
 		when 'fill' then meden.options.fill = value
 		else console.warn "Unknown option: " + varname
 
@@ -49,7 +51,6 @@ meden.options.wireframe = true
 xhr "model/hovercraft.obj", {}, (data) ->
 	window.model = new OBJLoader data
 
-	console.log window.model.make [0,0,100], [0,0,0], [1,1,1]
 	# Start rendering
 	canvasdiv = document.getElementById "canvas"
 	canvasdiv.removeChild document.getElementById "loading"

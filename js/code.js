@@ -36,7 +36,8 @@
       case 'wireframe':
         return meden.options.wireframe = value;
       case 'culling':
-        return meden.options.culling = value;
+        meden.options.culling = value;
+        return meden.img.options.ignoreDepth = !value;
       case 'fill':
         return meden.options.fill = value;
       default:
@@ -59,7 +60,6 @@
   xhr("model/hovercraft.obj", {}, function(data) {
     var canvasdiv;
     window.model = new OBJLoader(data);
-    console.log(window.model.make([0, 0, 100], [0, 0, 0], [1, 1, 1]));
     canvasdiv = document.getElementById("canvas");
     canvasdiv.removeChild(document.getElementById("loading"));
     canvasdiv.appendChild(c);

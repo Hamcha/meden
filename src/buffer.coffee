@@ -8,6 +8,8 @@ class Buffer
 		@b8  = new Uint8ClampedArray @bf
 		@b32 = new Uint32Array @bf
 		@depth = new ArrayBuffer @src.data.length
+		@options =
+			ignoreDepth: false
 		return
 
 	createDepth: () ->
@@ -22,10 +24,11 @@ class Buffer
 		return true
 
 	setPixelDepth: (x,y,z,c) ->
-		return false unless @depth?
-		return false if @depth[y*@w+x] < z
+		if !@options.ignoreDepth
+			return false unless @depth?
+			return false if @depth[y*@w+x] < z
+			@depth[y*@w+x] = z
 		@setPixel x,y,c
-		@depth[y*@w+x] = z
 		return true
 
 	getPixel: (x,y) -> 
