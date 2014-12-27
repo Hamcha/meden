@@ -12,13 +12,6 @@
       return (angle / 180) * Math.PI;
     };
 
-    MathUtil.applyRot = function(vertex, rotation) {
-      vertex = Matrix.multiply(vertex, Matrix.rotateX(rotation[0]));
-      vertex = Matrix.multiply(vertex, Matrix.rotateY(rotation[1]));
-      vertex = Matrix.multiply(vertex, Matrix.rotateZ(rotation[2]));
-      return vertex;
-    };
-
     MathUtil.eulerQuat = function(x, y, z) {
       var cx, cy, cz, sx, sy, sz;
       sx = Math.sin(x / 2);
@@ -62,24 +55,23 @@
       return [c[0] * m[0][0] + c[1] * m[0][1] + c[2] * m[0][2] + c[3] * m[0][3], c[0] * m[1][0] + c[1] * m[1][1] + c[2] * m[1][2] + c[3] * m[1][3], c[0] * m[2][0] + c[1] * m[2][1] + c[2] * m[2][2] + c[3] * m[2][3], c[0] * m[3][0] + c[1] * m[3][1] + c[2] * m[3][2] + c[3] * m[3][3]];
     };
 
-    Matrix.fromTransform = function(p, s) {
-      return [[s[0], 0, 0, p[0]], [0, s[1], 0, p[1]], [0, 0, s[2], p[2]], [0, 0, 0, 1]];
-    };
-
     Matrix.identity = function() {
       return [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
     };
 
-    Matrix.rotateX = function(a) {
-      return [[1, 0, 0, 0], [0, cos(a), sin(a), 0], [0, -sin(a), cos(a), 0], [0, 0, 0, 1]];
+    Matrix.applyMove = function(m, x, y, z) {
+      m[0][3] += x;
+      m[1][3] += y;
+      m[2][3] += z;
+      return m;
     };
 
-    Matrix.rotateY = function(a) {
-      return [[cos(a), 0, -sin(a), 0], [0, 1, 0, 0], [sin(a), 0, cos(a), 0], [0, 0, 0, 1]];
+    Matrix.applyScale = function(m, x, y, z) {
+      return [Vector.scale(m[0], x), Vector.scale(m[1], x), Vector.scale(m[2], x), m[3]];
     };
 
-    Matrix.rotateZ = function(a) {
-      return [[cos(a), sin(a), 0, 0], [-sin(a), cos(a), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
+    Matrix.rotation = function(x, y, z, w) {
+      return [[1 - 2 * y * y - 2 * z * z, 2 * x * y + 2 * z * w, 2 * x * z - 2 * y * w, 0], [2 * x * y - 2 * z * w, 1 - 2 * x * x - 2 * z * z, 2 * z * y + 2 * x * w, 0], [2 * x * z + 2 * y * w, 2 * z * y - 2 * x * w, 1 - 2 * x * x - 2 * y * y, 0], [0, 0, 0, 1]];
     };
 
     Matrix.perspective = function(ratio, near, far, fov) {

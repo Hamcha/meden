@@ -6,13 +6,7 @@ class MathUtil
 	# Degrees to Radian
 	@deg2rad: (angle) -> (angle / 180) * Math.PI
 
-	# Apply rotation on all three axis
-	@applyRot: (vertex, rotation) ->
-		vertex = Matrix.multiply vertex, Matrix.rotateX rotation[0]
-		vertex = Matrix.multiply vertex, Matrix.rotateY rotation[1]
-		vertex = Matrix.multiply vertex, Matrix.rotateZ rotation[2]
-		return vertex
-
+	# Euler angles to quaternion
 	@eulerQuat: (x, y, z) ->
 		sx = Math.sin x/2; cx = Math.cos x/2
 		sy = Math.sin y/2; cy = Math.cos y/2
@@ -42,13 +36,6 @@ class Matrix
 		 c[0]*m[2][0] + c[1]*m[2][1] + c[2]*m[2][2] + c[3]*m[2][3],
 		 c[0]*m[3][0] + c[1]*m[3][1] + c[2]*m[3][2] + c[3]*m[3][3]]
 
-	# Matrix from transform (position, scale)
-	@fromTransform: (p, s) ->
-		[[s[0], 0  , 0  ,p[0]],
-		 [ 0  ,s[1], 0  ,p[1]],
-		 [ 0  , 0  ,s[2],p[2]],
-		 [ 0  , 0  , 0  , 1  ]]
-
 	# Identity matrix
 	@identity: () ->
 		[[ 1 , 0 , 0 , 0 ],
@@ -56,24 +43,24 @@ class Matrix
 		 [ 0 , 0 , 1 , 0 ],
 		 [ 0 , 0 , 0 , 1 ]]
 
-	# Rotation matricies (X,Y,Z)
-	@rotateX: (a) ->
-		[[   1   ,   0   ,   0   ,0],
-		 [   0   , cos(a), sin(a),0],
-		 [   0   ,-sin(a), cos(a),0],
-		 [   0   ,   0   ,   0   ,1]]
+	# Apply transform (scale/rotation/movement) to matrix
+	@applyMove: (m, x, y, z) ->
+		m[0][3] += x
+		m[1][3] += y
+		m[2][3] += z
+		return m
 
-	@rotateY: (a) ->
-		[[ cos(a),   0   ,-sin(a),0],
-		 [   0   ,   1   ,   0   ,0],
-		 [ sin(a),   0   , cos(a),0],
-		 [   0   ,   0   ,   0   ,1]]
+	@applyScale: (m, x, y, z) ->
+		[(Vector.scale m[0], x),
+		 (Vector.scale m[1], x),
+		 (Vector.scale m[2], x),
+		               m[3]    ]
 
-	@rotateZ: (a) ->
-		[[ cos(a), sin(a),   0   ,0],
-		 [-sin(a), cos(a),   0   ,0],
-		 [   0   ,   0   ,   1   ,0],
-		 [   0   ,   0   ,   0   ,1]]
+	@rotation: (x, y, z, w) ->
+		[[1 - 2*y*y - 2*z*z,     2*x*y + 2*z*w,     2*x*z - 2*y*w, 0],
+		 [    2*x*y - 2*z*w, 1 - 2*x*x - 2*z*z,     2*z*y + 2*x*w, 0],
+		 [    2*x*z + 2*y*w,     2*z*y - 2*x*w, 1 - 2*x*x - 2*y*y, 0],
+		 [                0,                 0,                 0, 1]]
 
 	# Create Perspective Matrix
 	@perspective: (ratio, near, far, fov) ->

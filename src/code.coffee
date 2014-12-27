@@ -15,7 +15,7 @@ renderLoop = () ->
 
 	meden.clear()
 	#meden.draw Meshes.cube [0,0,20], [t*2,t,t/2], [3,3,3]
-	meden.draw window.model.make [0,1,10], [Math.PI-0.5,t,0], [2,2,2]
+	meden.draw window.model.make [0,1,10], [0,t,0.5], [2,2,2]
 	meden.show()
 
 	frameCount++

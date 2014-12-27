@@ -9,15 +9,6 @@ triangulateQuads = (faces) ->
 
 ## 3D Rendering functions ##
 
-# Backface Culling
-winding = (camera, face, obj) ->
-	mesh = obj.mesh; matrix = obj.transform.matrix()
-	prev = camera.project Matrix.multiply mesh.verts[face[0]], matrix
-	dep  = camera.project Matrix.multiply mesh.verts[face[1]], matrix
-	des  = camera.project Matrix.multiply mesh.verts[face[2]], matrix
-	area = ((dep[0]-prev[0]) * (prev[1]-des[1])) - ((des[0]-prev[0]) * (prev[1]-dep[1]))
-	return area > 0
-
 class Camera
 	constructor: (@width, @height, @fov, @near, @far) ->
 		@ratio = width / height
@@ -42,11 +33,14 @@ class Renderer
 	draw: (obj) ->
 		vx = []
 		mesh = obj.mesh; matrix = obj.transform.matrix()
+		debugger;
 		for face in mesh.faces
-			continue unless !@options.fill or winding @camera, face, obj
 			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]], matrix
 			dp1 = @camera.project Matrix.multiply mesh.verts[face[1]], matrix
 			dp2 = @camera.project Matrix.multiply mesh.verts[face[2]], matrix
+			area = ((dp1[0]-dp0[0]) * (dp0[1]-dp2[1])) - ((dp2[0]-dp0[0]) * (dp0[1]-dp1[1]))
+			culling = area > 0
+			continue unless culling or !@options.fill
 			vx.push [dp0, dp1, dp2]
 		if @options.fill
 			for dp in vx

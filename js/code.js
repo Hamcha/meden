@@ -18,7 +18,7 @@
     elapsed = now - start;
     requestAnimationFrame(renderLoop);
     meden.clear();
-    meden.draw(window.model.make([0, 1, 10], [Math.PI - 0.5, t, 0], [2, 2, 2]));
+    meden.draw(window.model.make([0, 1, 10], [0, t, 0.5], [2, 2, 2]));
     meden.show();
     frameCount++;
     if (elapsed > captureInterval) {

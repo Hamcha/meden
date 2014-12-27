@@ -1,13 +1,19 @@
 class Transform
-	constructor: (position, rotation, scale) ->
-		@rotationQuat = MathUtil.eulerQuat rotation
+	constructor: (@position, rotation, @scale) ->
+		@rotationQuat = MathUtil.eulerQuat rotation[0], rotation[1], rotation[2]
 		@dirty = true
-		@_matrix = Matrix.fromTransform position, scale
 		return
 
 	matrix: () ->
-		#@_makeMat if @dirty
+		@_makeMat() if @dirty
 		return @_matrix
+
+	_makeMat: () ->
+		@_matrix = Matrix.rotation @rotationQuat[0], @rotationQuat[1], @rotationQuat[2], @rotationQuat[3]
+		@_matrix = Matrix.applyScale @_matrix, @scale[0], @scale[1], @scale[2]
+		@_matrix = Matrix.applyMove  @_matrix, @position[0], @position[1], @position[2]
+		@dirty = false
+		return
 
 class Mesh
 	constructor: (@verts, @faces) ->
@@ -26,7 +32,6 @@ class Meshes
 		         [ 0.5, 0.5,-0.5,1],[ 0.5, 0.5, 0.5,1]]
 		faces = [[0,1,3,2],[1,5,7,3],[2,3,7,6],
 		         [4,6,7,5],[0,2,6,4],[0,4,5,1]]
-		verts = verts.map (v) -> MathUtil.applyRot v, rotation
 		faces = triangulateQuads faces
 		transform = new Transform position, rotation, scale
 		mesh = new Mesh verts, faces

@@ -1,5 +1,5 @@
 (function() {
-  var Camera, Renderer, triangulateQuads, winding;
+  var Camera, Renderer, triangulateQuads;
 
   triangulateQuads = function(faces) {
     var face, trifaces, _i, _len;
@@ -10,17 +10,6 @@
       trifaces.push([face[2], face[3], face[0]]);
     }
     return trifaces;
-  };
-
-  winding = function(camera, face, obj) {
-    var area, dep, des, matrix, mesh, prev;
-    mesh = obj.mesh;
-    matrix = obj.transform.matrix();
-    prev = camera.project(Matrix.multiply(mesh.verts[face[0]], matrix));
-    dep = camera.project(Matrix.multiply(mesh.verts[face[1]], matrix));
-    des = camera.project(Matrix.multiply(mesh.verts[face[2]], matrix));
-    area = ((dep[0] - prev[0]) * (prev[1] - des[1])) - ((des[0] - prev[0]) * (prev[1] - dep[1]));
-    return area > 0;
   };
 
   Camera = (function() {
@@ -60,19 +49,22 @@
     }
 
     Renderer.prototype.draw = function(obj) {
-      var dp, dp0, dp1, dp2, face, matrix, mesh, vx, wirecolor, _i, _j, _k, _len, _len1, _len2, _ref;
+      var area, culling, dp, dp0, dp1, dp2, face, matrix, mesh, vx, wirecolor, _i, _j, _k, _len, _len1, _len2, _ref;
       vx = [];
       mesh = obj.mesh;
       matrix = obj.transform.matrix();
+      debugger;
       _ref = mesh.faces;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         face = _ref[_i];
-        if (!(!this.options.fill || winding(this.camera, face, obj))) {
-          continue;
-        }
         dp0 = this.camera.project(Matrix.multiply(mesh.verts[face[0]], matrix));
         dp1 = this.camera.project(Matrix.multiply(mesh.verts[face[1]], matrix));
         dp2 = this.camera.project(Matrix.multiply(mesh.verts[face[2]], matrix));
+        area = ((dp1[0] - dp0[0]) * (dp0[1] - dp2[1])) - ((dp2[0] - dp0[0]) * (dp0[1] - dp1[1]));
+        culling = area > 0;
+        if (!(culling || !this.options.fill)) {
+          continue;
+        }
         vx.push([dp0, dp1, dp2]);
       }
       if (this.options.fill) {
