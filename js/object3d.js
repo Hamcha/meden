@@ -5,7 +5,7 @@
     function Transform(position, rotation, scale) {
       this.position = position;
       this.scale = scale;
-      this.rotationQuat = MathUtil.eulerQuat(rotation[0], rotation[1], rotation[2]);
+      this.rotationQuat = Vector.normalize(Quaternion.fromEuler(rotation[0], rotation[1], rotation[2]));
       this.dirty = true;
       return;
     }

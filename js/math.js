@@ -1,5 +1,5 @@
 (function() {
-  var MathUtil, Matrix, Vector, cos, sin;
+  var MathUtil, Matrix, Quaternion, Vector, cos, sin;
 
   cos = Math.cos;
 
@@ -10,17 +10,6 @@
 
     MathUtil.deg2rad = function(angle) {
       return (angle / 180) * Math.PI;
-    };
-
-    MathUtil.eulerQuat = function(x, y, z) {
-      var cx, cy, cz, sx, sy, sz;
-      sx = Math.sin(x / 2);
-      cx = Math.cos(x / 2);
-      sy = Math.sin(y / 2);
-      cy = Math.cos(y / 2);
-      sz = Math.sin(z / 2);
-      cz = Math.cos(z / 2);
-      return [cx * cy * cz + sx * sy * sz, sx * cy * cz - cx * sy * sz, cx * sy * cz + sx * cy * sz, cx * cy * sz - sx * sy * cz];
     };
 
     MathUtil.lerp = function(a, b, t) {
@@ -36,7 +25,7 @@
 
     Vector.normalize = function(v) {
       var len;
-      len = Math.sqrt(v[0] + v[1] + v[2] + v[3]);
+      len = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
       return [v[0] / len, v[1] / len, v[2] / len, v[3] / len];
     };
 
@@ -45,6 +34,24 @@
     };
 
     return Vector;
+
+  })();
+
+  Quaternion = (function() {
+    function Quaternion() {}
+
+    Quaternion.fromEuler = function(x, y, z) {
+      var cx, cy, cz, sx, sy, sz;
+      sx = Math.sin(x / 2);
+      cx = Math.cos(x / 2);
+      sy = Math.sin(y / 2);
+      cy = Math.cos(y / 2);
+      sz = Math.sin(z / 2);
+      cz = Math.cos(z / 2);
+      return [cx * cy * cz + sx * sy * sz, sx * cy * cz - cx * sy * sz, cx * sy * cz + sx * cy * sz, cx * cy * sz - sx * sy * cz];
+    };
+
+    return Quaternion;
 
   })();
 
@@ -90,6 +97,8 @@
   window.MathUtil = MathUtil;
 
   window.Vector = Vector;
+
+  window.Quaternion = Quaternion;
 
   window.Matrix = Matrix;
 

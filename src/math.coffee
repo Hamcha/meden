@@ -6,8 +6,21 @@ class MathUtil
 	# Degrees to Radian
 	@deg2rad: (angle) -> (angle / 180) * Math.PI
 
-	# Euler angles to quaternion
-	@eulerQuat: (x, y, z) ->
+	# Linear interpolation
+	@lerp: (a,b,t) -> a + (b - a) * t
+
+class Vector
+	# Normalize vector
+	@normalize: (v) ->
+		len = Math.sqrt v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + v[3]*v[3]
+		return [v[0] / len, v[1] / len, v[2] / len, v[3] / len]
+	# Multiply by scalar
+	@scale: (v,s) ->
+		[v[0] * s, v[1] * s, v[2] * s, v[3] * s]
+
+class Quaternion
+	# Create quaternion from euler angles
+	@fromEuler: (x, y, z) ->
 		sx = Math.sin x/2; cx = Math.cos x/2
 		sy = Math.sin y/2; cy = Math.cos y/2
 		sz = Math.sin z/2; cz = Math.cos z/2
@@ -15,18 +28,6 @@ class MathUtil
 		        sx*cy*cz - cx*sy*sz,
 		        cx*sy*cz + sx*cy*sz,
 		        cx*cy*sz - sx*sy*cz]
-
-	# Linear interpolation
-	@lerp: (a,b,t) -> a + (b - a) * t
-
-class Vector
-	# Normalize vector
-	@normalize: (v) ->
-		len = Math.sqrt v[0] + v[1] + v[2] + v[3]
-		return [v[0] / len, v[1] / len, v[2] / len, v[3] / len]
-	# Multiply by scalar
-	@scale: (v,s) ->
-		[v[0] * s, v[1] * s, v[2] * s, v[3] * s]
 
 class Matrix
 	# Multiply Vector4 (c) by Matrix4x4 (m)
@@ -75,4 +76,5 @@ class Matrix
 
 window.MathUtil = MathUtil
 window.Vector = Vector
+window.Quaternion = Quaternion
 window.Matrix = Matrix

@@ -1,6 +1,6 @@
 class Transform
 	constructor: (@position, rotation, @scale) ->
-		@rotationQuat = MathUtil.eulerQuat rotation[0], rotation[1], rotation[2]
+		@rotationQuat = Vector.normalize Quaternion.fromEuler rotation[0], rotation[1], rotation[2]
 		@dirty = true
 		return
 
