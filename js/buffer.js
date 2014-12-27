@@ -61,10 +61,10 @@
     Buffer.prototype.line = function(v1, v2, c) {
       var dx, dy, dz, e2, err, p, points, sx, sy, x, x1, x2, y, y1, y2, z, z1, z2, _i, _len;
       x1 = px(v1[0]);
-      y1 = px(v1[1]);
-      z1 = v1[2];
       x2 = px(v2[0]);
+      y1 = px(v1[1]);
       y2 = px(v2[1]);
+      z1 = v1[2];
       z2 = v2[2];
       dx = Math.abs(x2 - x1);
       dy = Math.abs(y2 - y1);

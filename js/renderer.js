@@ -1,5 +1,5 @@
 (function() {
-  var Camera, Meshes, Renderer, triangulateQuads, winding;
+  var Camera, Renderer, triangulateQuads, winding;
 
   triangulateQuads = function(faces) {
     var face, trifaces, _i, _len;
@@ -12,11 +12,13 @@
     return trifaces;
   };
 
-  winding = function(camera, face, mesh) {
-    var area, dep, des, prev;
-    prev = camera.project(Matrix.multiply(mesh.verts[face[0]], mesh.matrix));
-    dep = camera.project(Matrix.multiply(mesh.verts[face[1]], mesh.matrix));
-    des = camera.project(Matrix.multiply(mesh.verts[face[2]], mesh.matrix));
+  winding = function(camera, face, obj) {
+    var area, dep, des, matrix, mesh, prev;
+    mesh = obj.mesh;
+    matrix = obj.transform.matrix();
+    prev = camera.project(Matrix.multiply(mesh.verts[face[0]], matrix));
+    dep = camera.project(Matrix.multiply(mesh.verts[face[1]], matrix));
+    des = camera.project(Matrix.multiply(mesh.verts[face[2]], matrix));
     area = ((dep[0] - prev[0]) * (prev[1] - des[1])) - ((des[0] - prev[0]) * (prev[1] - dep[1]));
     return area > 0;
   };
@@ -57,18 +59,20 @@
       return;
     }
 
-    Renderer.prototype.draw = function(mesh) {
-      var dp, dp0, dp1, dp2, face, vx, wirecolor, _i, _j, _k, _len, _len1, _len2, _ref;
+    Renderer.prototype.draw = function(obj) {
+      var dp, dp0, dp1, dp2, face, matrix, mesh, vx, wirecolor, _i, _j, _k, _len, _len1, _len2, _ref;
       vx = [];
+      mesh = obj.mesh;
+      matrix = obj.transform.matrix();
       _ref = mesh.faces;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         face = _ref[_i];
-        if (!winding(this.camera, face, mesh)) {
+        if (!(!this.options.fill || winding(this.camera, face, obj))) {
           continue;
         }
-        dp0 = this.camera.project(Matrix.multiply(mesh.verts[face[0]], mesh.matrix));
-        dp1 = this.camera.project(Matrix.multiply(mesh.verts[face[1]], mesh.matrix));
-        dp2 = this.camera.project(Matrix.multiply(mesh.verts[face[2]], mesh.matrix));
+        dp0 = this.camera.project(Matrix.multiply(mesh.verts[face[0]], matrix));
+        dp1 = this.camera.project(Matrix.multiply(mesh.verts[face[1]], matrix));
+        dp2 = this.camera.project(Matrix.multiply(mesh.verts[face[2]], matrix));
         vx.push([dp0, dp1, dp2]);
       }
       if (this.options.fill) {
@@ -101,32 +105,7 @@
 
   })();
 
-  Meshes = (function() {
-    function Meshes() {}
-
-    Meshes.cube = function(position, rotation, scale) {
-      var faces, matrix, verts;
-      verts = [[-0.5, -0.5, -0.5, 1], [-0.5, -0.5, 0.5, 1], [-0.5, 0.5, -0.5, 1], [-0.5, 0.5, 0.5, 1], [0.5, -0.5, -0.5, 1], [0.5, -0.5, 0.5, 1], [0.5, 0.5, -0.5, 1], [0.5, 0.5, 0.5, 1]];
-      faces = [[0, 1, 3, 2], [1, 5, 7, 3], [2, 3, 7, 6], [4, 6, 7, 5], [0, 2, 6, 4], [0, 4, 5, 1]];
-      verts = verts.map(function(v) {
-        return MathUtil.applyRot(v, rotation);
-      });
-      faces = triangulateQuads(faces);
-      matrix = Matrix.fromTransform(position, scale);
-      return {
-        matrix: matrix,
-        verts: verts,
-        faces: faces
-      };
-    };
-
-    return Meshes;
-
-  })();
-
   window.Renderer = Renderer;
-
-  window.Meshes = Meshes;
 
 }).call(this);
 

@@ -19,8 +19,15 @@
       return vertex;
     };
 
-    MathUtil.vecfloor = function(v) {
-      return [v[0] | 0, v[1] | 0, v[2] | 0, v[3] | 0];
+    MathUtil.eulerQuat = function(x, y, z) {
+      var cx, cy, cz, sx, sy, sz;
+      sx = Math.sin(x / 2);
+      cx = Math.cos(x / 2);
+      sy = Math.sin(y / 2);
+      cy = Math.cos(y / 2);
+      sz = Math.sin(z / 2);
+      cz = Math.cos(z / 2);
+      return [cx * cy * cz + sx * sy * sz, sx * cy * cz - cx * sy * sz, cx * sy * cz + sx * cy * sz, cx * cy * sz - sx * sy * cz];
     };
 
     MathUtil.lerp = function(a, b, t) {
@@ -57,6 +64,10 @@
 
     Matrix.fromTransform = function(p, s) {
       return [[s[0], 0, 0, p[0]], [0, s[1], 0, p[1]], [0, 0, s[2], p[2]], [0, 0, 0, 1]];
+    };
+
+    Matrix.identity = function() {
+      return [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
     };
 
     Matrix.rotateX = function(a) {

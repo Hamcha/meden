@@ -41,12 +41,9 @@ class Buffer
 
 	# Brasenham algorithm
 	line: (v1, v2, c) ->
-		x1 = px v1[0]
-		y1 = px v1[1]
-		z1 =    v1[2]
-		x2 = px v2[0]
-		y2 = px v2[1]
-		z2 =    v2[2]
+		x1 = px v1[0]; x2 = px v2[0]
+		y1 = px v1[1]; y2 = px v2[1]
+		z1 =    v1[2]; z2 =    v2[2]
 
 		dx = Math.abs x2 - x1
 		dy = Math.abs y2 - y1
@@ -55,8 +52,7 @@ class Buffer
 		sy = if y1 < y2 then 1 else -1
 		err = dx - dy
 
-		x = x1
-		y = y1
+		x = x1;	y = y1
 
 		points = []
 		loop

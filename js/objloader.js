@@ -25,16 +25,13 @@
     }
 
     OBJLoader.prototype.make = function(position, rotation, scale) {
-      var matrix, verts;
+      var mesh, transform, verts;
       verts = this.verts.map(function(v) {
         return MathUtil.applyRot(v, rotation);
       });
-      matrix = Matrix.fromTransform(position, scale);
-      return {
-        matrix: matrix,
-        verts: verts,
-        faces: this.faces
-      };
+      transform = new Transform(position, rotation, scale);
+      mesh = new Mesh(verts, this.faces);
+      return new Object3d(mesh, transform);
     };
 
     return OBJLoader;

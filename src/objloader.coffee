@@ -1,7 +1,6 @@
 class OBJLoader
 	constructor: (data) ->
-		@verts = []
-		@faces = []
+		@verts = []; @faces = []
 		for line in data.split "\n"
 			params = line.split " "
 			type = params.splice 0,1
@@ -14,7 +13,8 @@ class OBJLoader
 
 	make: (position, rotation, scale) ->
 		verts = @verts.map (v) -> MathUtil.applyRot v, rotation
-		matrix = Matrix.fromTransform position, scale
-		return {matrix, verts, @faces}
+		transform = new Transform position, rotation, scale
+		mesh = new Mesh verts, @faces
+		return new Object3d mesh, transform
 
 window.OBJLoader = OBJLoader

@@ -10,10 +10,11 @@ triangulateQuads = (faces) ->
 ## 3D Rendering functions ##
 
 # Backface Culling
-winding = (camera, face, mesh) ->
-	prev = camera.project Matrix.multiply mesh.verts[face[0]],mesh.matrix
-	dep  = camera.project Matrix.multiply mesh.verts[face[1]],mesh.matrix
-	des  = camera.project Matrix.multiply mesh.verts[face[2]],mesh.matrix
+winding = (camera, face, obj) ->
+	mesh = obj.mesh; matrix = obj.transform.matrix()
+	prev = camera.project Matrix.multiply mesh.verts[face[0]], matrix
+	dep  = camera.project Matrix.multiply mesh.verts[face[1]], matrix
+	des  = camera.project Matrix.multiply mesh.verts[face[2]], matrix
 	area = ((dep[0]-prev[0]) * (prev[1]-des[1])) - ((des[0]-prev[0]) * (prev[1]-dep[1]))
 	return area > 0
 
@@ -38,13 +39,14 @@ class Renderer
 		@camera = new Camera width, height, 70, 0.1, 1000
 		return
 
-	draw: (mesh) ->
+	draw: (obj) ->
 		vx = []
+		mesh = obj.mesh; matrix = obj.transform.matrix()
 		for face in mesh.faces
-			continue unless winding @camera, face, mesh
-			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]], mesh.matrix
-			dp1 = @camera.project Matrix.multiply mesh.verts[face[1]], mesh.matrix
-			dp2 = @camera.project Matrix.multiply mesh.verts[face[2]], mesh.matrix
+			continue unless !@options.fill or winding @camera, face, obj
+			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]], matrix
+			dp1 = @camera.project Matrix.multiply mesh.verts[face[1]], matrix
+			dp2 = @camera.project Matrix.multiply mesh.verts[face[2]], matrix
 			vx.push [dp0, dp1, dp2]
 		if @options.fill
 			for dp in vx
@@ -66,19 +68,4 @@ class Renderer
 		@ctx.putImageData @img.src,0,0
 		return
 
-# Cube mesh generator
-class Meshes
-	@cube: (position,rotation,scale) ->
-		verts = [[-0.5,-0.5,-0.5,1],[-0.5,-0.5, 0.5,1],
-		         [-0.5, 0.5,-0.5,1],[-0.5, 0.5, 0.5,1],
-		         [ 0.5,-0.5,-0.5,1],[ 0.5,-0.5, 0.5,1],
-		         [ 0.5, 0.5,-0.5,1],[ 0.5, 0.5, 0.5,1]]
-		faces = [[0,1,3,2],[1,5,7,3],[2,3,7,6],
-		         [4,6,7,5],[0,2,6,4],[0,4,5,1]]
-		verts = verts.map (v) -> MathUtil.applyRot v, rotation
-		faces = triangulateQuads faces
-		matrix = Matrix.fromTransform position, scale
-		return {matrix, verts, faces}
-
 window.Renderer = Renderer
-window.Meshes = Meshes

@@ -13,10 +13,16 @@ class MathUtil
 		vertex = Matrix.multiply vertex, Matrix.rotateZ rotation[2]
 		return vertex
 
-	# Vector float->int
-	@vecfloor: (v) ->
-		[v[0]|0, v[1]|0, v[2]|0, v[3]|0]
+	@eulerQuat: (x, y, z) ->
+		sx = Math.sin x/2; cx = Math.cos x/2
+		sy = Math.sin y/2; cy = Math.cos y/2
+		sz = Math.sin z/2; cz = Math.cos z/2
+		return [cx*cy*cz + sx*sy*sz,
+		        sx*cy*cz - cx*sy*sz,
+		        cx*sy*cz + sx*cy*sz,
+		        cx*cy*sz - sx*sy*cz]
 
+	# Linear interpolation
 	@lerp: (a,b,t) -> a + (b - a) * t
 
 class Vector
@@ -42,6 +48,14 @@ class Matrix
 		 [ 0  ,s[1], 0  ,p[1]],
 		 [ 0  , 0  ,s[2],p[2]],
 		 [ 0  , 0  , 0  , 1  ]]
+
+	# Identity matrix
+	@identity: () ->
+		[[ 1 , 0 , 0 , 0 ],
+		 [ 0 , 1 , 0 , 0 ],
+		 [ 0 , 0 , 1 , 0 ],
+		 [ 0 , 0 , 0 , 1 ]]
+
 	# Rotation matricies (X,Y,Z)
 	@rotateX: (a) ->
 		[[   1   ,   0   ,   0   ,0],
