@@ -33,7 +33,6 @@ class Renderer
 	draw: (obj) ->
 		vx = []
 		mesh = obj.mesh; matrix = obj.transform.matrix()
-		debugger;
 		for face in mesh.faces
 			dp0 = @camera.project Matrix.multiply mesh.verts[face[0]], matrix
 			dp1 = @camera.project Matrix.multiply mesh.verts[face[1]], matrix

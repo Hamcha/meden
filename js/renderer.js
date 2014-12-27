@@ -53,7 +53,6 @@
       vx = [];
       mesh = obj.mesh;
       matrix = obj.transform.matrix();
-      debugger;
       _ref = mesh.faces;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         face = _ref[_i];
