@@ -23,7 +23,15 @@ class Object3d
 	constructor: (@mesh, @transform) ->
 		return
 
-# Cube mesh generator
+## General Utils ##
+
+triangulateQuads = (faces) ->
+	trifaces = []
+	for face in faces
+		trifaces.push [face[0], face[1], face[2]]
+		trifaces.push [face[2], face[3], face[0]]
+	return trifaces
+
 class Meshes
 	@cube: (position,rotation,scale) ->
 		verts = [[-0.5,-0.5,-0.5,1],[-0.5,-0.5, 0.5,1],

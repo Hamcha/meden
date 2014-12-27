@@ -1,5 +1,5 @@
 (function() {
-  var Mesh, Meshes, Object3d, Transform;
+  var Mesh, Meshes, Object3d, Transform, triangulateQuads;
 
   Transform = (function() {
     function Transform(position, rotation, scale) {
@@ -49,6 +49,17 @@
     return Object3d;
 
   })();
+
+  triangulateQuads = function(faces) {
+    var face, trifaces, _i, _len;
+    trifaces = [];
+    for (_i = 0, _len = faces.length; _i < _len; _i++) {
+      face = faces[_i];
+      trifaces.push([face[0], face[1], face[2]]);
+      trifaces.push([face[2], face[3], face[0]]);
+    }
+    return trifaces;
+  };
 
   Meshes = (function() {
     function Meshes() {}
