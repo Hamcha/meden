@@ -1,6 +1,3 @@
-# Absolute pixel
-px = (p) -> p|0
-
 class Buffer
 	constructor: (@ctx, @w, @h) ->
 		@src = ctx.createImageData w, h
@@ -11,6 +8,8 @@ class Buffer
 		return
 
 	setPixel: (x,y,c) ->
+		x = x|0
+		y = y|0
 		return false if x < 0 or x >= @w or y < 0 or y >= @h
 		@b32[y*@w+x] = (255  << 24) |
 		               (c[2] << 16) |
@@ -19,6 +18,8 @@ class Buffer
 		return true
 
 	setPixelDepth: (x,y,z,c) ->
+		x = x|0
+		y = y|0
 		return false unless @depth?
 		return false if @depth[y*@w+x] < z
 		@setPixel x,y,c
@@ -26,24 +27,28 @@ class Buffer
 		return true
 
 	getPixel: (x,y) ->
+		x = x|0
+		y = y|0
 		offset = y * @w + x
 		[@b8[offset], @b8[offset+1], @b8[offset+2]]
 
 	_horlineDepth: (x1, z1, x2, z2, y, c) ->
-		dz = (z2 - z1)/(x2 - x1)
-		z = z2
+		x1 = x1|0
+		x2 = x2|0
 		i = x2 - x1
-		return unless i > 0
-		while i--
+		dz = (z2 - z1)/i
+		z = z2
+		while i > 0
 			@setPixelDepth x1+i,y,z,c
 			z -= dz
+			i--
 		return
 
 	# Brasenham algorithm
 	line: (v1, v2, c) ->
-		x1 = px v1[0]; x2 = px v2[0]
-		y1 = px v1[1]; y2 = px v2[1]
-		z1 =    v1[2]; z2 =    v2[2]
+		x1 = v1[0]|0; x2 = v2[0]|0
+		y1 = v1[1]|0; y2 = v2[1]|0
+		z1 = v1[2]  ; z2 = v2[2]
 
 		dx = Math.abs x2 - x1
 		dy = Math.abs y2 - y1
@@ -65,7 +70,7 @@ class Buffer
 			if e2 <  dx
 				err += dx
 				y += sy
-		z = z1 - 0.04
+		z = z1
 		dz = (z2 - z1) / points.length
 		for p in points
 			@setPixelDepth p[0], p[1], z, c
@@ -79,6 +84,10 @@ class Buffer
 		[Ax, Ay, Az] = A
 		[Bx, By, Bz] = B
 		[Cx, Cy, Cz] = C
+
+		@line A, B, c
+		@line B, C, c
+		@line A, C, c
 
 		d1 = By - Ay
 		if d1 > 0
@@ -110,7 +119,7 @@ class Buffer
 		if dx1 > dx2
 			while line <= By
 				point = start
-				@_horlineDepth px(start), startD, px(end), endD, px(line), c
+				@_horlineDepth start, startD, end, endD, line, c
 				start += dx2
 				end += dx1
 				startD += dz2
@@ -118,7 +127,7 @@ class Buffer
 				line++
 			end = Bx
 			while line <= Cy
-				@_horlineDepth px(start), startD, px(end), endD, px(line), c
+				@_horlineDepth start, startD, end, endD, line, c
 				start += dx2
 				end += dx3
 				startD += dz2
@@ -126,7 +135,7 @@ class Buffer
 				line++
 		else
 			while line <= By
-				@_horlineDepth px(start), startD, px(end), endD, px(line), c
+				@_horlineDepth start, startD, end, endD, line, c
 				start += dx1
 				end += dx2
 				startD += dz1
@@ -134,7 +143,7 @@ class Buffer
 				line++
 			start = Bx
 			while line <= Cy
-				@_horlineDepth px(start), startD, px(end), endD, px(line), c
+				@_horlineDepth start, startD, Math.ceil(end), endD, line, c
 				start += dx3
 				end += dx2
 				startD += dz3

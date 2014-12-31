@@ -1,9 +1,5 @@
 (function() {
-  var Buffer, px;
-
-  px = function(p) {
-    return p | 0;
-  };
+  var Buffer;
 
   Buffer = (function() {
     function Buffer(ctx, w, h) {
@@ -19,6 +15,8 @@
     }
 
     Buffer.prototype.setPixel = function(x, y, c) {
+      x = x | 0;
+      y = y | 0;
       if (x < 0 || x >= this.w || y < 0 || y >= this.h) {
         return false;
       }
@@ -27,6 +25,8 @@
     };
 
     Buffer.prototype.setPixelDepth = function(x, y, z, c) {
+      x = x | 0;
+      y = y | 0;
       if (this.depth == null) {
         return false;
       }
@@ -40,30 +40,32 @@
 
     Buffer.prototype.getPixel = function(x, y) {
       var offset;
+      x = x | 0;
+      y = y | 0;
       offset = y * this.w + x;
       return [this.b8[offset], this.b8[offset + 1], this.b8[offset + 2]];
     };
 
     Buffer.prototype._horlineDepth = function(x1, z1, x2, z2, y, c) {
       var dz, i, z;
-      dz = (z2 - z1) / (x2 - x1);
-      z = z2;
+      x1 = x1 | 0;
+      x2 = x2 | 0;
       i = x2 - x1;
-      if (!(i > 0)) {
-        return;
-      }
-      while (i--) {
+      dz = (z2 - z1) / i;
+      z = z2;
+      while (i > 0) {
         this.setPixelDepth(x1 + i, y, z, c);
         z -= dz;
+        i--;
       }
     };
 
     Buffer.prototype.line = function(v1, v2, c) {
       var dx, dy, dz, e2, err, p, points, sx, sy, x, x1, x2, y, y1, y2, z, z1, z2, _i, _len;
-      x1 = px(v1[0]);
-      x2 = px(v2[0]);
-      y1 = px(v1[1]);
-      y2 = px(v2[1]);
+      x1 = v1[0] | 0;
+      x2 = v2[0] | 0;
+      y1 = v1[1] | 0;
+      y2 = v2[1] | 0;
       z1 = v1[2];
       z2 = v2[2];
       dx = Math.abs(x2 - x1);
@@ -89,7 +91,7 @@
           y += sy;
         }
       }
-      z = z1 - 0.04;
+      z = z1;
       dz = (z2 - z1) / points.length;
       for (_i = 0, _len = points.length; _i < _len; _i++) {
         p = points[_i];
@@ -106,6 +108,9 @@
       Ax = A[0], Ay = A[1], Az = A[2];
       Bx = B[0], By = B[1], Bz = B[2];
       Cx = C[0], Cy = C[1], Cz = C[2];
+      this.line(A, B, c);
+      this.line(B, C, c);
+      this.line(A, C, c);
       d1 = By - Ay;
       if (d1 > 0) {
         div = 1 / d1;
@@ -136,7 +141,7 @@
       if (dx1 > dx2) {
         while (line <= By) {
           point = start;
-          this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
+          this._horlineDepth(start, startD, end, endD, line, c);
           start += dx2;
           end += dx1;
           startD += dz2;
@@ -145,7 +150,7 @@
         }
         end = Bx;
         while (line <= Cy) {
-          this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
+          this._horlineDepth(start, startD, end, endD, line, c);
           start += dx2;
           end += dx3;
           startD += dz2;
@@ -154,7 +159,7 @@
         }
       } else {
         while (line <= By) {
-          this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
+          this._horlineDepth(start, startD, end, endD, line, c);
           start += dx1;
           end += dx2;
           startD += dz1;
@@ -163,7 +168,7 @@
         }
         start = Bx;
         while (line <= Cy) {
-          this._horlineDepth(px(start), startD, px(end), endD, px(line), c);
+          this._horlineDepth(start, startD, Math.ceil(end), endD, line, c);
           start += dx3;
           end += dx2;
           startD += dz3;

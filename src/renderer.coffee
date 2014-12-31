@@ -47,9 +47,13 @@ class Renderer
 		if @options.wireframe
 			wirecolor =	if @options.fill then [0,0,0] else [255,255,255]
 			for dp in vx
-				@img.line dp[0],dp[1],wirecolor
-				@img.line dp[1],dp[2],wirecolor
-				@img.line dp[2],dp[0],wirecolor
+				[A, B, C] = [dp[0][..], dp[1][..], dp[2][..]]
+				A[2] -= 0.05
+				B[2] -= 0.05
+				C[2] -= 0.05
+				@img.line A,B,wirecolor
+				@img.line B,C,wirecolor
+				@img.line C,A,wirecolor
 		return
 
 	clear: ->

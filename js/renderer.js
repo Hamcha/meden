@@ -49,7 +49,7 @@
     }
 
     Renderer.prototype.draw = function(obj) {
-      var area, culling, dp, dp0, dp1, dp2, face, matrix, mesh, vx, wirecolor, _i, _j, _k, _len, _len1, _len2, _ref;
+      var A, B, C, area, culling, dp, dp0, dp1, dp2, face, matrix, mesh, vx, wirecolor, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
       vx = [];
       mesh = obj.mesh;
       matrix = obj.transform.matrix();
@@ -76,9 +76,13 @@
         wirecolor = this.options.fill ? [0, 0, 0] : [255, 255, 255];
         for (_k = 0, _len2 = vx.length; _k < _len2; _k++) {
           dp = vx[_k];
-          this.img.line(dp[0], dp[1], wirecolor);
-          this.img.line(dp[1], dp[2], wirecolor);
-          this.img.line(dp[2], dp[0], wirecolor);
+          _ref1 = [dp[0].slice(0), dp[1].slice(0), dp[2].slice(0)], A = _ref1[0], B = _ref1[1], C = _ref1[2];
+          A[2] -= 0.05;
+          B[2] -= 0.05;
+          C[2] -= 0.05;
+          this.img.line(A, B, wirecolor);
+          this.img.line(B, C, wirecolor);
+          this.img.line(C, A, wirecolor);
         }
       }
     };
